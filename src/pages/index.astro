@@ -35,6 +35,13 @@ const photos = [
   { src: photo5, alt: 'Chipmunk snacking on a rock' },
   { src: photo6, alt: 'Niagara Falls with a friend' },
 ];
+
+/* ── "Now" section — swap these whenever you want ── */
+const now = [
+  { label: 'Reading', value: 'Shoe Dog', sub: 'Phil Knight', icon: 'book' },
+  { label: 'Listening', value: 'Acquired', sub: 'Podcast', icon: 'headphones' },
+  { label: 'Into', value: 'Skiing', sub: 'Season ends too fast', icon: 'mountain' },
+];
 ---
 
 <Layout metadata={metadata}>
@@ -43,7 +50,7 @@ const photos = [
       links={[
         { text: 'Home', href: '#' },
         { text: 'Photos', href: '#photos' },
-        { text: 'Writing', href: '#writing' },
+        { text: 'Now', href: '#now' },
         { text: 'Projects', href: '#projects' },
         { text: 'Work', href: '#work' },
       ]}
@@ -56,8 +63,8 @@ const photos = [
   <!-- HERO                                          -->
   <!-- ============================================ -->
   <section class="relative min-h-screen flex items-center justify-center overflow-hidden">
-    <!-- Background image -->
-    <div class="absolute inset-0">
+    <!-- Background image — parallax target -->
+    <div id="hero-bg" class="absolute inset-0 will-change-transform">
       <Image
         src={heroBg}
         alt="Lake sunset"
@@ -86,7 +93,7 @@ const photos = [
       <p class="text-xs uppercase tracking-[0.4em] text-white/50 mb-5 font-sans">
         personal site
       </p>
-      <h1 class="text-6xl sm:text-7xl md:text-8xl font-heading font-bold text-white leading-[0.9] mb-8 italic">
+      <h1 class="hero-gradient-name text-6xl sm:text-7xl md:text-8xl font-heading font-bold leading-[0.9] mb-8 italic">
         Justin<br />Milligan
       </h1>
       <p class="text-lg sm:text-xl text-white/50 font-light max-w-md mx-auto mb-10">
@@ -141,11 +148,11 @@ const photos = [
   </section>
 
   <!-- ============================================ -->
-  <!-- PHOTO GALLERY — 3x2 grid                     -->
+  <!-- PHOTO GALLERY — 3x2 grid + lightbox          -->
   <!-- ============================================ -->
   <section id="photos" class="py-20 sm:py-28">
     <div class="max-w-6xl mx-auto px-4 sm:px-6">
-      <div class="text-center mb-14">
+      <div class="text-center mb-14 animate-on-scroll">
         <p class="text-xs uppercase tracking-[0.3em] text-muted mb-3">Photos</p>
         <h2 class="text-4xl sm:text-5xl font-heading font-bold italic mb-6">Some of my favorites</h2>
         <p class="text-base text-muted max-w-md mx-auto font-light leading-relaxed">
@@ -153,10 +160,13 @@ const photos = [
         </p>
       </div>
 
-      <!-- 3x2 grid -->
+      <!-- 3x2 grid — click to open lightbox -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         {photos.map((photo, i) => (
-          <div class="overflow-hidden rounded-lg group aspect-[4/3]">
+          <div
+            class="overflow-hidden rounded-lg group aspect-[4/3] cursor-pointer lightbox-trigger animate-on-scroll"
+            style={`transition-delay: ${i * 0.08}s`}
+          >
             <Image
               src={photo.src}
               alt={photo.alt}
@@ -164,6 +174,10 @@ const photos = [
               widths={[400, 700]}
               loading={i < 3 ? "eager" : "lazy"}
             />
+            <!-- Hover caption -->
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+              <span class="text-xs text-white/80 font-light">{photo.alt}</span>
+            </div>
           </div>
         ))}
       </div>
@@ -175,10 +189,51 @@ const photos = [
   <!-- ============================================ -->
   <section id="writing" class="py-20 sm:py-28">
     <div class="max-w-3xl mx-auto px-4 sm:px-6">
-      <div class="text-center">
+      <div class="text-center animate-on-scroll">
         <p class="text-xs uppercase tracking-[0.3em] text-muted mb-3">Writing</p>
         <h2 class="text-4xl sm:text-5xl font-heading font-bold italic mb-6">Words</h2>
-        <p class="text-base text-muted italic">Coming soon.</p>
+        <p class="text-base text-muted max-w-md mx-auto font-light leading-relaxed mb-2">
+          I've been collecting thoughts. Nothing worth publishing yet.
+        </p>
+        <p class="text-sm text-muted/50 italic">Check back soon.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- NOW — what I'm currently into                 -->
+  <!-- ============================================ -->
+  <section id="now" class="py-20 sm:py-28">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6">
+      <div class="text-center mb-14 animate-on-scroll">
+        <p class="text-xs uppercase tracking-[0.3em] text-muted mb-3">Now</p>
+        <h2 class="text-4xl sm:text-5xl font-heading font-bold italic mb-6">What I'm Into</h2>
+        <p class="text-sm text-muted/60 font-light">Updated March 2026</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        {now.map((item, i) => (
+          <div
+            class="relative p-6 rounded-2xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/10 transition-all duration-300 text-center animate-on-scroll"
+            style={`transition-delay: ${i * 0.12}s`}
+          >
+            <!-- Icon -->
+            <div class="flex justify-center mb-4">
+              {item.icon === 'book' && (
+                <svg class="w-5 h-5 text-amber-400/60" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>
+              )}
+              {item.icon === 'headphones' && (
+                <svg class="w-5 h-5 text-amber-400/60" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" /></svg>
+              )}
+              {item.icon === 'mountain' && (
+                <svg class="w-5 h-5 text-amber-400/60" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 20.25L9.75 3.75l4.5 9 3-4.5L20.25 20.25H3z" /></svg>
+              )}
+            </div>
+            <p class="text-[10px] uppercase tracking-[0.3em] text-amber-400/50 mb-3">{item.label}</p>
+            <p class="text-sm font-medium text-white/80 mb-1">{item.value}</p>
+            <p class="text-[11px] text-white/30">{item.sub}</p>
+          </div>
+        ))}
       </div>
     </div>
   </section>
@@ -188,7 +243,7 @@ const photos = [
   <!-- ============================================ -->
   <section id="projects" class="py-20 sm:py-28">
     <div class="max-w-5xl mx-auto px-4 sm:px-6">
-      <div class="text-center mb-14">
+      <div class="text-center mb-14 animate-on-scroll">
         <p class="text-xs uppercase tracking-[0.3em] text-muted mb-3">Projects</p>
         <h2 class="text-4xl sm:text-5xl font-heading font-bold italic mb-6">Projects</h2>
         <p class="text-base text-muted max-w-md mx-auto font-light leading-relaxed">
@@ -198,7 +253,7 @@ const photos = [
 
       <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <!-- Wish App -->
-        <a href="https://wish-ten-mu.vercel.app" target="_blank" rel="noopener" class="group relative overflow-hidden rounded-2xl min-h-[280px] flex flex-col justify-end bg-gradient-to-br from-gray-900 to-gray-800 border border-white/5 hover:border-amber-400/20 transition-all duration-300">
+        <a href="https://wish-ten-mu.vercel.app" target="_blank" rel="noopener" class="group relative overflow-hidden rounded-2xl min-h-[280px] flex flex-col justify-end bg-gradient-to-br from-gray-900 to-gray-800 border border-white/5 hover:border-amber-400/20 transition-all duration-300 animate-on-scroll" style="transition-delay: 0s">
           <!-- Subtle grid pattern -->
           <div class="absolute inset-0 opacity-[0.03]" style="background-image: linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px); background-size: 32px 32px;"></div>
           <!-- Glow -->
@@ -215,7 +270,7 @@ const photos = [
         </a>
 
         <!-- PriceRX -->
-        <a href="/pricerx" class="group relative overflow-hidden rounded-2xl min-h-[280px] flex flex-col justify-end bg-gradient-to-br from-gray-900 to-gray-800 border border-white/5 hover:border-amber-400/20 transition-all duration-300">
+        <a href="/pricerx" class="group relative overflow-hidden rounded-2xl min-h-[280px] flex flex-col justify-end bg-gradient-to-br from-gray-900 to-gray-800 border border-white/5 hover:border-amber-400/20 transition-all duration-300 animate-on-scroll" style="transition-delay: 0.12s">
           <div class="absolute inset-0 opacity-[0.03]" style="background-image: linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px); background-size: 32px 32px;"></div>
           <div class="absolute top-0 right-0 w-32 h-32 bg-sky-400/10 rounded-full blur-2xl group-hover:bg-sky-400/20 transition-all duration-500"></div>
           <div class="absolute bottom-0 left-0 w-24 h-24 bg-amber-400/10 rounded-full blur-2xl"></div>
@@ -230,7 +285,7 @@ const photos = [
         </a>
 
         <!-- Placeholder card 3 -->
-        <div class="group relative overflow-hidden rounded-2xl min-h-[280px] flex flex-col justify-end bg-gradient-to-br from-gray-900 to-gray-800 border border-white/5">
+        <div class="group relative overflow-hidden rounded-2xl min-h-[280px] flex flex-col justify-end bg-gradient-to-br from-gray-900 to-gray-800 border border-white/5 animate-on-scroll" style="transition-delay: 0.24s">
           <div class="absolute inset-0 opacity-[0.03]" style="background-image: linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px); background-size: 32px 32px;"></div>
           <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-400/10 rounded-full blur-2xl"></div>
           <div class="relative z-10 p-7">
@@ -250,7 +305,7 @@ const photos = [
   <!-- ============================================ -->
   <section id="work" class="py-20 sm:py-28">
     <div class="max-w-5xl mx-auto px-4 sm:px-6">
-      <div class="text-center mb-14">
+      <div class="text-center mb-14 animate-on-scroll">
         <p class="text-xs uppercase tracking-[0.3em] text-muted mb-3">Documents</p>
         <h2 class="text-4xl sm:text-5xl font-heading font-bold italic mb-6">Work</h2>
       </div>
@@ -260,7 +315,8 @@ const photos = [
         <a
           href="/files/senior-thesis-justin-milligan.pdf"
           target="_blank"
-          class="group relative overflow-hidden rounded-2xl min-h-[360px] flex flex-col justify-end"
+          class="group relative overflow-hidden rounded-2xl min-h-[360px] flex flex-col justify-end animate-on-scroll"
+          style="transition-delay: 0s"
         >
           <!-- Photo background (mountain sunset) -->
           <Image
@@ -299,7 +355,8 @@ const photos = [
         <a
           href="/files/justin-milligan-resume.docx"
           target="_blank"
-          class="group relative overflow-hidden rounded-2xl min-h-[360px] flex flex-col justify-end"
+          class="group relative overflow-hidden rounded-2xl min-h-[360px] flex flex-col justify-end animate-on-scroll"
+          style="transition-delay: 0.12s"
         >
           <!-- Photo background -->
           <Image
@@ -329,7 +386,7 @@ const photos = [
   <!-- FOOTER / CONNECT                              -->
   <!-- ============================================ -->
   <section class="py-16 sm:py-20 border-t border-gray-200 dark:border-white/5">
-    <div class="max-w-2xl mx-auto px-4 sm:px-6 text-center">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 text-center animate-on-scroll">
       <h2 class="text-3xl sm:text-4xl font-heading font-bold italic mb-4">Say hello</h2>
       <p class="text-muted mb-8">
         <a href="mailto:justin.milligan334@gmail.com" class="underline decoration-amber-400/50 hover:decoration-amber-400 underline-offset-4 transition-colors">justin.milligan334@gmail.com</a>
@@ -348,4 +405,145 @@ const photos = [
       </div>
     </div>
   </section>
+
+  <!-- ============================================ -->
+  <!-- LIGHTBOX OVERLAY                              -->
+  <!-- ============================================ -->
+  <div id="lightbox" class="fixed inset-0 z-[9999] bg-black/95 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 cursor-pointer">
+    <button id="lightbox-close" class="absolute top-6 right-6 w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white/60 hover:text-white transition-all" aria-label="Close">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+    <img id="lightbox-img" class="max-w-[92vw] max-h-[88vh] object-contain rounded-lg shadow-2xl transition-transform duration-300 scale-95" alt="" />
+  </div>
 </Layout>
+
+<!-- ============================================ -->
+<!-- GLOBAL STYLES                                 -->
+<!-- ============================================ -->
+<style is:global>
+  /* ── Scroll-triggered animations ── */
+  .animate-on-scroll {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .animate-on-scroll.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── Hero gradient-animated name ── */
+  .hero-gradient-name {
+    background: linear-gradient(
+      120deg,
+      #ffffff 0%,
+      #fbbf24 25%,
+      #ffffff 50%,
+      #fbbf24 75%,
+      #ffffff 100%
+    );
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: hero-gradient-shift 8s ease-in-out infinite;
+  }
+  @keyframes hero-gradient-shift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* ── Lightbox active state ── */
+  #lightbox.is-active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  #lightbox.is-active #lightbox-img {
+    transform: scale(1);
+  }
+
+  /* ── Photo hover caption overlay needs relative parent ── */
+  .lightbox-trigger {
+    position: relative;
+  }
+</style>
+
+<!-- ============================================ -->
+<!-- CLIENT-SIDE SCRIPTS                           -->
+<!-- ============================================ -->
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', function () {
+
+    /* ── 1. Scroll-triggered fade-in animations ── */
+    var animEls = document.querySelectorAll('.animate-on-scroll');
+    if ('IntersectionObserver' in window) {
+      var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+      animEls.forEach(function (el) { observer.observe(el); });
+    } else {
+      /* Fallback: show everything immediately */
+      animEls.forEach(function (el) { el.classList.add('is-visible'); });
+    }
+
+    /* ── 2. Hero parallax ── */
+    var heroBg = document.getElementById('hero-bg');
+    if (heroBg) {
+      var ticking = false;
+      window.addEventListener('scroll', function () {
+        if (!ticking) {
+          requestAnimationFrame(function () {
+            var y = window.scrollY;
+            if (y < window.innerHeight * 1.2) {
+              heroBg.style.transform = 'translateY(' + (y * 0.35) + 'px)';
+            }
+            ticking = false;
+          });
+          ticking = true;
+        }
+      }, { passive: true });
+    }
+
+    /* ── 3. Photo lightbox ── */
+    var lightbox = document.getElementById('lightbox');
+    var lightboxImg = document.getElementById('lightbox-img');
+
+    document.querySelectorAll('.lightbox-trigger').forEach(function (el) {
+      el.addEventListener('click', function () {
+        var img = el.querySelector('img');
+        if (img && lightbox && lightboxImg) {
+          /* Use the largest available src */
+          var src = img.currentSrc || img.src;
+          lightboxImg.src = src;
+          lightboxImg.alt = img.alt || '';
+          lightbox.classList.add('is-active');
+          document.body.style.overflow = 'hidden';
+        }
+      });
+    });
+
+    function closeLightbox() {
+      if (lightbox) {
+        lightbox.classList.remove('is-active');
+        document.body.style.overflow = '';
+      }
+    }
+
+    if (lightbox) {
+      lightbox.addEventListener('click', closeLightbox);
+    }
+
+    /* Close on Escape key */
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeLightbox();
+    });
+
+  });
+</script>
