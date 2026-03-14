@@ -236,6 +236,14 @@ const photos = [
   <!-- ============================================ -->
   <section id="photos" class="py-20 sm:py-24">
     <div class="max-w-6xl mx-auto px-4 sm:px-6">
+      <div class="text-center mb-12 sm:mb-14 animate-on-scroll">
+        <p class="text-xs uppercase tracking-[0.3em] text-muted mb-3">Photos</p>
+        <h2 class="text-4xl sm:text-5xl font-heading font-bold italic mb-5">Some of my favorites</h2>
+        <p class="text-base text-muted max-w-md mx-auto font-light leading-relaxed">
+          I bought a camera in 2022. I have successfully taken 6 good pictures.
+        </p>
+      </div>
+
       <!-- 3x2 grid — click to open lightbox -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         {photos.map((photo, i) => (
@@ -253,14 +261,6 @@ const photos = [
           </div>
         ))}
       </div>
-
-      <div class="text-center mt-12 sm:mt-14 animate-on-scroll">
-        <p class="text-xs uppercase tracking-[0.3em] text-muted mb-3">Photos</p>
-        <h2 class="text-4xl sm:text-5xl font-heading font-bold italic mb-5">Some of my favorites</h2>
-        <p class="text-base text-muted max-w-md mx-auto font-light leading-relaxed">
-          I bought a camera in 2022. I have successfully taken 6 good pictures.
-        </p>
-      </div>
     </div>
   </section>
 
@@ -271,8 +271,8 @@ const photos = [
     <div class="max-w-6xl mx-auto px-4 sm:px-6">
       <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 mb-12 animate-on-scroll">
         <div>
-          <p class="text-xs uppercase tracking-[0.3em] text-muted mb-3">Apps / Tools</p>
-          <h2 class="text-4xl sm:text-5xl font-heading font-bold italic">Things I'm building</h2>
+          <p class="text-xs uppercase tracking-[0.3em] text-muted mb-3">Apps and tools</p>
+          <h2 class="text-4xl sm:text-5xl font-heading font-bold italic">Things I'm building for fun</h2>
         </div>
         <p class="text-base text-muted max-w-md font-light leading-relaxed sm:text-right">
           A few projects that feel useful, weird, or worth spending real time on.
