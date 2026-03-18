@@ -1,0 +1,1451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fantasy Draft</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ========== BOLD ATHLETIC DESIGN ========== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0b0b0f;
+  --bg-card: rgba(255,255,255,0.04);
+  --bg-card-hover: rgba(255,255,255,0.07);
+  --text: #ffffff;
+  --text-muted: rgba(255,255,255,0.45);
+  --text-secondary: rgba(255,255,255,0.7);
+  --border: rgba(255,255,255,0.06);
+  --success: #22c55e;
+  --success-bg: rgba(34,197,94,0.1);
+  --error: #ef4444;
+  --error-bg: rgba(239,68,68,0.1);
+  --blue: #2563eb;
+  --blue-bright: #3b82f6;
+  --blue-glow: rgba(37,99,235,0.4);
+  --red: #dc2626;
+  --red-bright: #ef4444;
+  --nba-primary: #FF6B00;
+  --nba-glow: rgba(255,107,0,0.3);
+  --nfl-primary: #013369;
+  --nfl-glow: rgba(1,51,105,0.3);
+  --accent: var(--blue);
+  --accent-bright: var(--blue-bright);
+  --accent-glow: var(--blue-glow);
+  --radius: 4px;
+  --shadow: 0 4px 20px rgba(0,0,0,0.5);
+  --font-display: 'Oswald', Impact, sans-serif;
+  --font-body: 'Inter', -apple-system, sans-serif;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  line-height: 1.5;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.screen { display: none; min-height: 100vh; padding: 20px; }
+.screen.active { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+/* ========== ATHLETIC CARD ========== */
+.card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--accent-bright);
+  padding: 40px 36px;
+  width: 100%;
+  max-width: 540px;
+  position: relative;
+}
+
+/* ========== INPUTS ========== */
+input[type="text"], input[type="password"] {
+  width: 100%;
+  padding: 14px 16px;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-left: 3px solid var(--accent-bright);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 500;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+}
+input::placeholder { color: var(--text-muted); }
+input:focus { border-color: var(--accent-bright); background: rgba(37,99,235,0.06); border-left-color: var(--accent-bright); }
+
+/* ========== BUTTONS ========== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 15px 32px;
+  border: none;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #fff;
+  background: var(--accent);
+  clip-path: polygon(0 0, 100% 0, 96% 100%, 4% 100%);
+  position: relative;
+}
+.btn:hover:not(:disabled) { background: var(--accent-bright); box-shadow: 0 0 30px var(--accent-glow); transform: translateY(-1px); }
+.btn:active:not(:disabled) { transform: translateY(0); }
+.btn:disabled { opacity: 0.25; cursor: not-allowed; }
+
+.btn-large { padding: 17px 40px; font-size: 1.05rem; }
+.btn-outline {
+  background: transparent;
+  border: 2px solid var(--accent-bright);
+  color: var(--accent-bright);
+  clip-path: none;
+}
+.btn-outline:hover:not(:disabled) { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* ========== SPORT SELECTOR ========== */
+.sport-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
+.sport-btn {
+  position: relative;
+  height: 160px;
+  background: #111;
+  border: 2px solid rgba(255,255,255,0.06);
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all 0.3s;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  clip-path: polygon(0 0, 100% 0, 100% 92%, 94% 100%, 0 100%);
+}
+.sport-btn .sport-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.3;
+  transition: opacity 0.4s, transform 0.6s;
+  filter: saturate(0.7);
+}
+.sport-btn:hover .sport-bg { opacity: 0.5; transform: scale(1.08); filter: saturate(1); }
+.sport-btn .sport-label {
+  position: relative;
+  z-index: 1;
+  padding: 18px 16px;
+  width: 100%;
+  background: linear-gradient(transparent, rgba(0,0,0,0.85));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.sport-btn .sport-icon { display: none; }
+.sport-btn:hover { border-color: rgba(255,255,255,0.15); }
+.sport-btn.selected {
+  border-color: var(--accent-bright);
+  box-shadow: 0 0 25px var(--accent-glow), inset 0 0 30px rgba(37,99,235,0.08);
+}
+.sport-btn.selected .sport-bg { opacity: 0.55; filter: saturate(1.1); }
+.sport-btn.selected::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--accent-bright);
+}
+
+/* ========== FORM GROUP ========== */
+.form-group { margin-bottom: 18px; }
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+}
+
+/* ========== SETUP SCREEN ========== */
+#setup-screen .card { max-width: 520px; }
+.setup-header { text-align: center; margin-bottom: 32px; position: relative; }
+.setup-title {
+  font-family: var(--font-display);
+  font-size: 3.2rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  line-height: 0.95;
+  color: var(--text);
+  position: relative;
+}
+.setup-title .highlight {
+  color: var(--accent-bright);
+  position: relative;
+}
+.setup-subtitle {
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.35em;
+  color: var(--text-muted);
+  margin-top: 12px;
+}
+.setup-divider {
+  width: 60px;
+  height: 3px;
+  background: var(--accent-bright);
+  margin: 14px auto 0;
+}
+
+/* ========== LOADING SCREEN ========== */
+#loading-screen { text-align: center; }
+.loader-container { position: relative; width: 80px; height: 80px; margin: 0 auto 28px; }
+.loader-bar {
+  position: absolute;
+  bottom: 0;
+  width: 8px;
+  background: var(--accent-bright);
+  animation: barPulse 1s ease-in-out infinite;
+}
+.loader-bar:nth-child(1) { left: 8px; height: 30px; animation-delay: 0s; }
+.loader-bar:nth-child(2) { left: 24px; height: 50px; animation-delay: 0.15s; }
+.loader-bar:nth-child(3) { left: 40px; height: 70px; animation-delay: 0.3s; }
+.loader-bar:nth-child(4) { left: 56px; height: 40px; animation-delay: 0.45s; }
+.loader-bar:nth-child(5) { left: 72px; height: 20px; animation-delay: 0.6s; }
+@keyframes barPulse {
+  0%, 100% { opacity: 0.3; transform: scaleY(0.5); }
+  50% { opacity: 1; transform: scaleY(1); }
+}
+.loader-text {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+  min-height: 2em;
+  transition: opacity 0.3s;
+}
+.loader-error { color: var(--error); margin-top: 16px; font-size: 0.9rem; max-width: 400px; }
+
+/* ========== DRAFT SCREEN ========== */
+#draft-screen { justify-content: flex-start; padding-top: 36px; }
+.draft-header { text-align: center; margin-bottom: 20px; }
+.draft-player-name {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.draft-slot-info {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+
+.progress-bar-container { width: 100%; max-width: 540px; height: 3px; background: rgba(255,255,255,0.06); margin-bottom: 28px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: var(--accent-bright); transition: width 0.4s ease; box-shadow: 0 0 8px var(--accent-glow); }
+
+.clue-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent-bright);
+  padding: 24px 28px;
+  max-width: 540px;
+  width: 100%;
+  margin-bottom: 20px;
+}
+.clue-slot-badge {
+  display: inline-block;
+  padding: 3px 14px;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-bottom: 12px;
+  clip-path: polygon(0 0, 100% 0, 95% 100%, 5% 100%);
+}
+.clue-text { font-size: 1.1rem; line-height: 1.75; color: var(--text-secondary); font-weight: 400; }
+
+/* Correct answer reveal */
+.correct-player-reveal {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 12px;
+  padding: 14px 18px;
+  background: var(--success-bg);
+  border: 1px solid rgba(34,197,94,0.2);
+  border-left: 3px solid var(--success);
+}
+.correct-player-reveal img, .correct-player-reveal .avatar-fallback {
+  width: 52px; height: 52px;
+  border-radius: 4px;
+  object-fit: cover;
+  border: 2px solid var(--accent-bright);
+  background: rgba(37,99,235,0.1);
+  flex-shrink: 0;
+}
+.avatar-fallback {
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 0.85rem; color: var(--accent-bright);
+  font-family: var(--font-display); text-transform: uppercase;
+}
+.correct-player-info {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--success);
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.answer-area { max-width: 540px; width: 100%; }
+.answer-row { display: flex; gap: 10px; }
+.answer-row input { flex: 1; }
+
+.answer-feedback {
+  margin-top: 10px; padding: 10px 14px;
+  font-weight: 600; font-size: 0.85rem;
+  display: none;
+  border-left: 3px solid transparent;
+}
+.answer-feedback.error { display: block; background: var(--error-bg); color: var(--error); border-left-color: var(--error); }
+.answer-feedback.success { display: none; }
+.attempts-left {
+  font-family: var(--font-display);
+  font-size: 0.7rem; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.15em;
+  color: var(--text-muted); margin-top: 8px;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-6px); }
+  80% { transform: translateX(6px); }
+}
+.shake { animation: shake 0.35s ease; }
+@keyframes greenFlash {
+  0% { box-shadow: 0 0 0 0 rgba(34,197,94,0.5); }
+  100% { box-shadow: 0 0 30px 10px rgba(34,197,94,0); }
+}
+.green-flash { animation: greenFlash 0.5s ease-out; }
+
+/* ========== ROSTER SUMMARY ========== */
+.roster-summary { max-width: 540px; width: 100%; }
+.roster-summary h2 {
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 1.6rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  margin-bottom: 20px;
+}
+.roster-list { list-style: none; }
+.roster-item {
+  display: flex; align-items: center; gap: 14px;
+  padding: 10px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent-bright);
+  margin-bottom: 6px;
+  transition: background 0.2s;
+}
+.roster-item:hover { background: var(--bg-card-hover); }
+.roster-item img, .roster-item .avatar-fallback {
+  width: 42px; height: 42px; border-radius: 4px;
+  object-fit: cover; border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(37,99,235,0.08); flex-shrink: 0;
+}
+.roster-item .slot-label {
+  font-family: var(--font-display); font-weight: 600;
+  color: var(--accent-bright); min-width: 40px;
+  font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase;
+}
+.roster-item .player-name { font-weight: 600; flex: 1; font-size: 0.95rem; }
+.roster-item .no-pick { color: var(--text-muted); font-style: italic; flex: 1; }
+
+/* ========== HANDOFF SCREEN ========== */
+#handoff-screen { text-align: center; }
+.handoff-text {
+  font-family: var(--font-display); font-size: 2rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 8px;
+}
+.handoff-sub {
+  font-family: var(--font-display); font-size: 0.7rem; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.25em;
+  color: var(--text-muted); margin-bottom: 32px;
+}
+
+/* ========== REVEAL SCREEN ========== */
+#reveal-screen { justify-content: flex-start; padding-top: 28px; }
+
+.vs-header {
+  display: flex; align-items: center; justify-content: center; gap: 20px;
+  margin-bottom: 24px; padding: 18px 32px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--accent-bright);
+}
+.vs-p-name {
+  font-family: var(--font-display); font-size: 1.5rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+.vs-divider {
+  font-family: var(--font-display); font-size: 0.75rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.15em;
+  color: var(--text-muted);
+  padding: 6px 14px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+}
+
+.reveal-grid { width: 100%; max-width: 760px; }
+.reveal-row {
+  display: grid; grid-template-columns: 1fr 50px 1fr; gap: 8px;
+  align-items: center; margin-bottom: 8px; min-height: 76px;
+  opacity: 0; transition: opacity 0.3s;
+}
+.reveal-row.visible { opacity: 1; }
+.reveal-row.active-row .reveal-slot-label { animation: pulseSlot 0.8s ease infinite; }
+@keyframes pulseSlot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.reveal-cell {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 3px solid transparent;
+  padding: 10px 12px;
+  display: flex; align-items: center; gap: 10px;
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.22,1,0.36,1);
+}
+.reveal-cell.show-left { animation: slideInLeft 0.4s cubic-bezier(0.22,1,0.36,1) forwards; }
+.reveal-cell.show-right { animation: slideInRight 0.4s cubic-bezier(0.22,1,0.36,1) forwards; }
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.reveal-cell img, .reveal-cell .avatar-fallback {
+  width: 42px; height: 42px; border-radius: 4px;
+  object-fit: cover; border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(37,99,235,0.08); flex-shrink: 0;
+}
+.reveal-cell .pick-info { flex: 1; min-width: 0; }
+.reveal-cell .pick-name { font-weight: 600; font-size: 0.88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.reveal-cell .pick-score {
+  font-family: var(--font-display); font-size: 1.4rem; font-weight: 700;
+  color: var(--accent-bright); margin-top: 1px; letter-spacing: 0.02em;
+}
+.reveal-cell.winner { border-left-color: var(--success); background: var(--success-bg); }
+.reveal-cell.winner .pick-score { color: var(--success); }
+.reveal-cell.loser { opacity: 0.35; }
+.reveal-cell.no-pick-cell { opacity: 0.15; }
+.reveal-cell.cell-right { flex-direction: row-reverse; text-align: right; border-left: 1px solid var(--border); border-right: 3px solid transparent; }
+.reveal-cell.cell-right.winner { border-right-color: var(--success); border-left-color: var(--border); }
+
+.reveal-slot-label {
+  font-family: var(--font-display); font-weight: 700;
+  color: var(--accent-bright); font-size: 0.7rem;
+  text-align: center; letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* Totals */
+.reveal-totals {
+  display: grid; grid-template-columns: 1fr 50px 1fr; gap: 8px;
+  margin-top: 20px; padding-top: 20px;
+  border-top: 1px solid var(--border);
+  opacity: 0; transition: opacity 0.5s;
+}
+.reveal-totals.visible { opacity: 1; }
+.total-cell {
+  text-align: center; padding: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--border);
+}
+.total-cell .total-label {
+  font-family: var(--font-display); font-size: 0.65rem;
+  text-transform: uppercase; letter-spacing: 0.25em;
+  color: var(--text-muted); margin-bottom: 4px;
+}
+.total-cell .total-score {
+  font-family: var(--font-display); font-size: 2.6rem; font-weight: 700; color: var(--text);
+}
+.total-cell.winner-total { border-top-color: var(--accent-bright); }
+.total-cell.winner-total .total-score { color: var(--accent-bright); }
+
+/* Winner banner */
+.winner-banner {
+  text-align: center; margin-top: 28px; padding: 28px 40px;
+  background: linear-gradient(180deg, rgba(37,99,235,0.08) 0%, rgba(37,99,235,0.02) 100%);
+  border: 1px solid var(--border); border-top: 3px solid var(--accent-bright);
+  opacity: 0; transform: translateY(20px);
+  transition: all 0.5s cubic-bezier(0.22,1,0.36,1);
+}
+.winner-banner.visible { opacity: 1; transform: translateY(0); }
+.winner-name {
+  font-family: var(--font-display); font-size: 2.6rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.04em; color: var(--text);
+}
+.winner-label {
+  font-family: var(--font-display); font-size: 1rem; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.15em;
+  color: var(--text-muted); margin-top: 4px;
+}
+
+/* Confetti */
+.confetti-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1000; overflow: hidden; }
+.confetti-piece { position: absolute; top: -20px; animation: confettiFall linear forwards; }
+@keyframes confettiFall {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+}
+
+.play-again-area { margin-top: 28px; opacity: 0; transition: opacity 0.5s; }
+.play-again-area.visible { opacity: 1; }
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 600px) {
+  .card { padding: 28px 20px; }
+  .setup-title { font-size: 2.4rem; }
+  .draft-player-name { font-size: 1.5rem; }
+  .clue-text { font-size: 1rem; }
+  .vs-header { gap: 12px; padding: 14px 16px; }
+  .vs-p-name { font-size: 1.15rem; }
+  .reveal-cell img, .reveal-cell .avatar-fallback { width: 34px; height: 34px; }
+  .reveal-cell .pick-name { font-size: 0.8rem; }
+  .reveal-cell .pick-score { font-size: 1.1rem; }
+  .total-cell .total-score { font-size: 1.8rem; }
+  .winner-name { font-size: 1.8rem; }
+  .sport-selector { grid-template-columns: 1fr; }
+  .sport-btn { height: 120px; }
+  .winner-banner { padding: 20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ========== SCREEN 1: SETUP ========== -->
+<div id="setup-screen" class="screen active">
+  <div class="card">
+    <div class="setup-header">
+      <div class="setup-title">FANTASY<br><span class="highlight">DRAFT</span></div>
+      <div class="setup-subtitle">Two Players. One Draft. Who Builds the Better Roster?</div>
+      <div class="setup-divider"></div>
+    </div>
+
+    <div class="form-group">
+      <label>API Key</label>
+      <input type="password" id="api-key-input" placeholder="sk-ant-..." autocomplete="off">
+    </div>
+    <div class="form-group">
+      <label>Player 1</label>
+      <input type="text" id="p1-name-input" placeholder="Enter name" maxlength="20">
+    </div>
+    <div class="form-group">
+      <label>Player 2</label>
+      <input type="text" id="p2-name-input" placeholder="Enter name" maxlength="20">
+    </div>
+    <div class="form-group">
+      <label>Choose Your League</label>
+      <div class="sport-selector">
+        <button class="sport-btn" data-sport="nba" onclick="selectSport('nba')">
+          <div class="sport-bg" style="background-image:url('https://images.unsplash.com/photo-1546519638-68e109498ffc?w=600&q=80')"></div>
+          <div class="sport-label">NBA</div>
+        </button>
+        <button class="sport-btn" data-sport="nfl" onclick="selectSport('nfl')">
+          <div class="sport-bg" style="background-image:url('https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=600&q=80')"></div>
+          <div class="sport-label">NFL</div>
+        </button>
+      </div>
+    </div>
+    <button class="btn btn-large" id="start-btn" style="width:100%" onclick="startGame()" disabled>Start Draft</button>
+  </div>
+</div>
+
+<!-- ========== SCREEN 2: LOADING ========== -->
+<div id="loading-screen" class="screen">
+  <div class="loader-container">
+    <div class="loader-bar"></div>
+    <div class="loader-bar"></div>
+    <div class="loader-bar"></div>
+    <div class="loader-bar"></div>
+    <div class="loader-bar"></div>
+  </div>
+  <div class="loader-text" id="loader-text">Scouting the league</div>
+  <div class="loader-error" id="loader-error" style="display:none"></div>
+  <button class="btn btn-outline" id="retry-btn" style="display:none;margin-top:16px" onclick="retryGenerate()">Retry</button>
+</div>
+
+<!-- ========== SCREEN 3: DRAFT ========== -->
+<div id="draft-screen" class="screen">
+  <div class="draft-header">
+    <div class="draft-player-name" id="draft-player-name"></div>
+    <div class="draft-slot-info" id="draft-slot-info"></div>
+  </div>
+  <div class="progress-bar-container"><div class="progress-bar-fill" id="progress-fill"></div></div>
+  <div class="clue-card" id="clue-card">
+    <div class="clue-slot-badge" id="clue-slot-badge"></div>
+    <div class="clue-text" id="clue-text"></div>
+  </div>
+  <div class="answer-area">
+    <div class="answer-row">
+      <input type="text" id="answer-input" placeholder="Type a player name..." autocomplete="off">
+      <button class="btn" id="submit-answer-btn" onclick="submitAnswer()">Submit</button>
+    </div>
+    <div class="answer-feedback" id="answer-feedback"></div>
+    <div id="correct-reveal" style="display:none"></div>
+    <div class="attempts-left" id="attempts-left"></div>
+  </div>
+</div>
+
+<!-- ========== SCREEN 3B: ROSTER SUMMARY ========== -->
+<div id="roster-screen" class="screen">
+  <div class="roster-summary">
+    <h2 id="roster-title"></h2>
+    <ul class="roster-list" id="roster-list"></ul>
+    <button class="btn btn-large" style="width:100%;margin-top:20px" id="lock-in-btn" onclick="lockIn()">Lock It In</button>
+  </div>
+</div>
+
+<!-- ========== SCREEN 3.5: HANDOFF ========== -->
+<div id="handoff-screen" class="screen">
+  <div class="handoff-text" id="handoff-text"></div>
+  <div class="handoff-sub">Don't let them see your picks</div>
+  <button class="btn btn-large" onclick="startPlayer2Turn()">Ready</button>
+</div>
+
+<!-- ========== SCREEN 5: REVEAL ========== -->
+<div id="reveal-screen" class="screen">
+  <div class="vs-header">
+    <span class="vs-p-name" id="reveal-p1-name"></span>
+    <span class="vs-divider">VS</span>
+    <span class="vs-p-name" id="reveal-p2-name"></span>
+  </div>
+  <div class="reveal-grid" id="reveal-grid"></div>
+  <div class="reveal-totals" id="reveal-totals">
+    <div class="total-cell" id="total-p1"><div class="total-label">Total</div><div class="total-score" id="total-p1-score">0</div></div>
+    <div style="display:flex;align-items:center;justify-content:center"><span class="vs-divider" style="font-size:0.6rem;padding:4px 10px">VS</span></div>
+    <div class="total-cell" id="total-p2"><div class="total-label">Total</div><div class="total-score" id="total-p2-score">0</div></div>
+  </div>
+  <div class="winner-banner" id="winner-banner">
+    <div class="winner-name" id="winner-name-text"></div>
+    <div class="winner-label" id="winner-label-text"></div>
+  </div>
+  <div class="play-again-area" id="play-again-area">
+    <button class="btn btn-large" onclick="playAgain()">Play Again</button>
+  </div>
+</div>
+
+<div class="confetti-container" id="confetti-container"></div>
+
+<script>
+/* ===========================================================
+   PLAYER DATASETS — Real career statistics + ESPN IDs
+   =========================================================== */
+
+const NBA_PLAYERS = [
+  { name: "Stephen Curry", position: "PG", teams: ["Warriors"], career_ppg: 24.8, career_rpg: 4.7, career_apg: 6.4, career_spg: 1.7, career_bpg: 0.2, championships: 4, all_star_appearances: 10, active: true, draft_year: 2009, jersey_numbers: [30], first_letter_last_name: "C", espn_id: 3975 },
+  { name: "LeBron James", position: "SF", teams: ["Cavaliers", "Heat", "Lakers"], career_ppg: 27.1, career_rpg: 7.5, career_apg: 7.4, career_spg: 1.5, career_bpg: 0.8, championships: 4, all_star_appearances: 20, active: true, draft_year: 2003, jersey_numbers: [23, 6], first_letter_last_name: "J", espn_id: 1966 },
+  { name: "Kevin Durant", position: "SF", teams: ["Thunder", "Warriors", "Nets", "Suns"], career_ppg: 27.3, career_rpg: 7.1, career_apg: 4.4, career_spg: 1.1, career_bpg: 1.1, championships: 2, all_star_appearances: 14, active: true, draft_year: 2007, jersey_numbers: [35, 7], first_letter_last_name: "D", espn_id: 3202 },
+  { name: "Giannis Antetokounmpo", position: "PF", teams: ["Bucks"], career_ppg: 23.4, career_rpg: 9.8, career_apg: 4.9, career_spg: 1.2, career_bpg: 1.3, championships: 1, all_star_appearances: 8, active: true, draft_year: 2013, jersey_numbers: [34], first_letter_last_name: "A", espn_id: 3032977 },
+  { name: "Nikola Jokic", position: "C", teams: ["Nuggets"], career_ppg: 20.7, career_rpg: 10.4, career_apg: 7.0, career_spg: 1.3, career_bpg: 0.7, championships: 1, all_star_appearances: 6, active: true, draft_year: 2014, jersey_numbers: [15], first_letter_last_name: "J", espn_id: 3112335 },
+  { name: "Luka Doncic", position: "PG", teams: ["Mavericks", "Lakers"], career_ppg: 28.7, career_rpg: 8.3, career_apg: 8.3, career_spg: 1.2, career_bpg: 0.4, championships: 0, all_star_appearances: 5, active: true, draft_year: 2018, jersey_numbers: [77], first_letter_last_name: "D", espn_id: 3945274 },
+  { name: "Joel Embiid", position: "C", teams: ["76ers"], career_ppg: 27.3, career_rpg: 11.2, career_apg: 3.6, career_spg: 0.9, career_bpg: 1.7, championships: 0, all_star_appearances: 7, active: true, draft_year: 2014, jersey_numbers: [21], first_letter_last_name: "E", espn_id: 3059318 },
+  { name: "Jayson Tatum", position: "SF", teams: ["Celtics"], career_ppg: 23.1, career_rpg: 7.2, career_apg: 4.6, career_spg: 1.1, career_bpg: 0.7, championships: 1, all_star_appearances: 5, active: true, draft_year: 2017, jersey_numbers: [0], first_letter_last_name: "T", espn_id: 4065648 },
+  { name: "Jimmy Butler", position: "SF", teams: ["Bulls", "Timberwolves", "76ers", "Heat"], career_ppg: 20.0, career_rpg: 5.5, career_apg: 4.5, career_spg: 1.6, career_bpg: 0.5, championships: 0, all_star_appearances: 6, active: true, draft_year: 2011, jersey_numbers: [21, 22, 23], first_letter_last_name: "B", espn_id: 6430 },
+  { name: "Damian Lillard", position: "PG", teams: ["Trail Blazers", "Bucks"], career_ppg: 25.1, career_rpg: 4.2, career_apg: 6.7, career_spg: 1.0, career_bpg: 0.3, championships: 0, all_star_appearances: 7, active: true, draft_year: 2012, jersey_numbers: [0], first_letter_last_name: "L", espn_id: 6606 },
+  { name: "Anthony Davis", position: "PF", teams: ["Pelicans", "Lakers"], career_ppg: 24.0, career_rpg: 10.5, career_apg: 2.5, career_spg: 1.3, career_bpg: 2.3, championships: 1, all_star_appearances: 9, active: true, draft_year: 2012, jersey_numbers: [23, 3], first_letter_last_name: "D", espn_id: 6583 },
+  { name: "James Harden", position: "SG", teams: ["Thunder", "Rockets", "Nets", "76ers", "Clippers"], career_ppg: 24.1, career_rpg: 5.3, career_apg: 7.0, career_spg: 1.4, career_bpg: 0.5, championships: 0, all_star_appearances: 10, active: true, draft_year: 2009, jersey_numbers: [13, 1], first_letter_last_name: "H", espn_id: 3992 },
+  { name: "Kawhi Leonard", position: "SF", teams: ["Spurs", "Raptors", "Clippers"], career_ppg: 20.0, career_rpg: 6.4, career_apg: 2.9, career_spg: 1.7, career_bpg: 0.4, championships: 2, all_star_appearances: 5, active: true, draft_year: 2011, jersey_numbers: [2], first_letter_last_name: "L", espn_id: 6450 },
+  { name: "Russell Westbrook", position: "PG", teams: ["Thunder", "Rockets", "Wizards", "Lakers", "Clippers", "Nuggets"], career_ppg: 22.0, career_rpg: 7.3, career_apg: 8.3, career_spg: 1.6, career_bpg: 0.3, championships: 0, all_star_appearances: 9, active: true, draft_year: 2008, jersey_numbers: [0], first_letter_last_name: "W", espn_id: 3468 },
+  { name: "Kyrie Irving", position: "PG", teams: ["Cavaliers", "Celtics", "Nets", "Mavericks"], career_ppg: 23.6, career_rpg: 3.9, career_apg: 5.7, career_spg: 1.3, career_bpg: 0.3, championships: 1, all_star_appearances: 8, active: true, draft_year: 2011, jersey_numbers: [2, 11], first_letter_last_name: "I", espn_id: 6442 },
+  { name: "Paul George", position: "SF", teams: ["Pacers", "Thunder", "Clippers", "76ers"], career_ppg: 20.8, career_rpg: 6.4, career_apg: 3.6, career_spg: 1.7, career_bpg: 0.4, championships: 0, all_star_appearances: 9, active: true, draft_year: 2010, jersey_numbers: [24, 13], first_letter_last_name: "G", espn_id: 4251 },
+  { name: "Devin Booker", position: "SG", teams: ["Suns"], career_ppg: 25.6, career_rpg: 4.3, career_apg: 5.5, career_spg: 0.9, career_bpg: 0.3, championships: 0, all_star_appearances: 4, active: true, draft_year: 2015, jersey_numbers: [1], first_letter_last_name: "B", espn_id: 3136193 },
+  { name: "Trae Young", position: "PG", teams: ["Hawks"], career_ppg: 25.3, career_rpg: 3.7, career_apg: 9.5, career_spg: 0.9, career_bpg: 0.2, championships: 0, all_star_appearances: 3, active: true, draft_year: 2018, jersey_numbers: [11], first_letter_last_name: "Y", espn_id: 4277905 },
+  { name: "Donovan Mitchell", position: "SG", teams: ["Jazz", "Cavaliers"], career_ppg: 24.4, career_rpg: 4.2, career_apg: 4.7, career_spg: 1.4, career_bpg: 0.3, championships: 0, all_star_appearances: 3, active: true, draft_year: 2017, jersey_numbers: [45], first_letter_last_name: "M", espn_id: 3908809 },
+  { name: "Shai Gilgeous-Alexander", position: "PG", teams: ["Clippers", "Thunder"], career_ppg: 24.8, career_rpg: 5.1, career_apg: 5.6, career_spg: 1.5, career_bpg: 0.8, championships: 0, all_star_appearances: 3, active: true, draft_year: 2018, jersey_numbers: [2], first_letter_last_name: "G", espn_id: 4278073 },
+  { name: "Kobe Bryant", position: "SG", teams: ["Lakers"], career_ppg: 25.0, career_rpg: 5.2, career_apg: 4.7, career_spg: 1.4, career_bpg: 0.5, championships: 5, all_star_appearances: 18, active: false, draft_year: 1996, jersey_numbers: [8, 24], first_letter_last_name: "B", espn_id: 110 },
+  { name: "Michael Jordan", position: "SG", teams: ["Bulls", "Wizards"], career_ppg: 30.1, career_rpg: 6.2, career_apg: 5.3, career_spg: 2.3, career_bpg: 0.8, championships: 6, all_star_appearances: 14, active: false, draft_year: 1984, jersey_numbers: [23, 45], first_letter_last_name: "J", espn_id: 1035 },
+  { name: "Tim Duncan", position: "PF", teams: ["Spurs"], career_ppg: 19.0, career_rpg: 10.8, career_apg: 3.0, career_spg: 0.7, career_bpg: 2.2, championships: 5, all_star_appearances: 15, active: false, draft_year: 1997, jersey_numbers: [21], first_letter_last_name: "D", espn_id: 215 },
+  { name: "Shaquille ONeal", position: "C", teams: ["Magic", "Lakers", "Heat", "Suns", "Cavaliers", "Celtics"], career_ppg: 23.7, career_rpg: 10.9, career_apg: 2.5, career_spg: 0.6, career_bpg: 2.3, championships: 4, all_star_appearances: 15, active: false, draft_year: 1992, jersey_numbers: [32, 34, 36, 33], first_letter_last_name: "O", espn_id: 614 },
+  { name: "Dirk Nowitzki", position: "PF", teams: ["Mavericks"], career_ppg: 20.7, career_rpg: 7.5, career_apg: 2.4, career_spg: 0.8, career_bpg: 0.8, championships: 1, all_star_appearances: 14, active: false, draft_year: 1998, jersey_numbers: [41], first_letter_last_name: "N", espn_id: 609 },
+  { name: "Dwyane Wade", position: "SG", teams: ["Heat", "Bulls", "Cavaliers"], career_ppg: 22.0, career_rpg: 4.7, career_apg: 5.4, career_spg: 1.5, career_bpg: 0.9, championships: 3, all_star_appearances: 13, active: false, draft_year: 2003, jersey_numbers: [3], first_letter_last_name: "W", espn_id: 1987 },
+  { name: "Kevin Garnett", position: "PF", teams: ["Timberwolves", "Celtics", "Nets"], career_ppg: 17.8, career_rpg: 10.0, career_apg: 3.7, career_spg: 1.3, career_bpg: 1.4, championships: 1, all_star_appearances: 15, active: false, draft_year: 1995, jersey_numbers: [21, 5, 2], first_letter_last_name: "G", espn_id: 261 },
+  { name: "Allen Iverson", position: "PG", teams: ["76ers", "Nuggets", "Pistons", "Grizzlies"], career_ppg: 26.7, career_rpg: 3.7, career_apg: 6.2, career_spg: 2.2, career_bpg: 0.2, championships: 0, all_star_appearances: 11, active: false, draft_year: 1996, jersey_numbers: [3, 1], first_letter_last_name: "I", espn_id: 366 },
+  { name: "Steve Nash", position: "PG", teams: ["Suns", "Mavericks", "Lakers"], career_ppg: 14.3, career_rpg: 2.7, career_apg: 8.5, career_spg: 0.7, career_bpg: 0.1, championships: 0, all_star_appearances: 8, active: false, draft_year: 1996, jersey_numbers: [13, 10], first_letter_last_name: "N", espn_id: 592 },
+  { name: "Chris Paul", position: "PG", teams: ["Hornets", "Clippers", "Rockets", "Thunder", "Suns", "Warriors", "Spurs"], career_ppg: 17.5, career_rpg: 4.5, career_apg: 9.4, career_spg: 2.1, career_bpg: 0.2, championships: 0, all_star_appearances: 12, active: false, draft_year: 2005, jersey_numbers: [3], first_letter_last_name: "P", espn_id: 2779 },
+  { name: "Dwight Howard", position: "C", teams: ["Magic", "Lakers", "Rockets", "Hawks", "Hornets", "Wizards", "76ers"], career_ppg: 15.7, career_rpg: 11.8, career_apg: 1.4, career_spg: 0.9, career_bpg: 1.8, championships: 1, all_star_appearances: 8, active: false, draft_year: 2004, jersey_numbers: [12, 39, 21], first_letter_last_name: "H", espn_id: 2384 },
+  { name: "Carmelo Anthony", position: "SF", teams: ["Nuggets", "Knicks", "Thunder", "Rockets", "Trail Blazers", "Lakers"], career_ppg: 22.5, career_rpg: 6.2, career_apg: 2.7, career_spg: 1.0, career_bpg: 0.5, championships: 0, all_star_appearances: 10, active: false, draft_year: 2003, jersey_numbers: [15, 7, 00], first_letter_last_name: "A", espn_id: 1975 },
+  { name: "Tony Parker", position: "PG", teams: ["Spurs", "Hornets"], career_ppg: 15.5, career_rpg: 2.7, career_apg: 5.6, career_spg: 0.7, career_bpg: 0.1, championships: 4, all_star_appearances: 6, active: false, draft_year: 2001, jersey_numbers: [9], first_letter_last_name: "P", espn_id: 1015 },
+  { name: "Ray Allen", position: "SG", teams: ["Bucks", "Sonics", "Celtics", "Heat"], career_ppg: 18.9, career_rpg: 4.1, career_apg: 3.4, career_spg: 1.1, career_bpg: 0.2, championships: 2, all_star_appearances: 10, active: false, draft_year: 1996, jersey_numbers: [34, 20], first_letter_last_name: "A", espn_id: 9 },
+  { name: "Paul Pierce", position: "SF", teams: ["Celtics", "Nets", "Wizards", "Clippers"], career_ppg: 19.7, career_rpg: 5.6, career_apg: 3.5, career_spg: 1.3, career_bpg: 0.6, championships: 1, all_star_appearances: 10, active: false, draft_year: 1998, jersey_numbers: [34], first_letter_last_name: "P", espn_id: 662 },
+  { name: "Vince Carter", position: "SG", teams: ["Raptors", "Nets", "Magic", "Suns", "Mavericks", "Grizzlies", "Kings", "Hawks"], career_ppg: 16.7, career_rpg: 4.3, career_apg: 3.1, career_spg: 1.0, career_bpg: 0.5, championships: 0, all_star_appearances: 8, active: false, draft_year: 1998, jersey_numbers: [15, 25], first_letter_last_name: "C", espn_id: 136 },
+  { name: "Tracy McGrady", position: "SG", teams: ["Raptors", "Magic", "Rockets", "Knicks", "Pistons", "Hawks", "Spurs"], career_ppg: 19.6, career_rpg: 5.6, career_apg: 4.4, career_spg: 1.2, career_bpg: 0.9, championships: 0, all_star_appearances: 7, active: false, draft_year: 1997, jersey_numbers: [1, 3], first_letter_last_name: "M", espn_id: 532 },
+  { name: "Karl Malone", position: "PF", teams: ["Jazz", "Lakers"], career_ppg: 25.0, career_rpg: 10.1, career_apg: 3.6, career_spg: 1.4, career_bpg: 0.8, championships: 0, all_star_appearances: 14, active: false, draft_year: 1985, jersey_numbers: [32, 11], first_letter_last_name: "M", espn_id: 501 },
+  { name: "John Stockton", position: "PG", teams: ["Jazz"], career_ppg: 13.1, career_rpg: 2.7, career_apg: 10.5, career_spg: 2.2, career_bpg: 0.2, championships: 0, all_star_appearances: 10, active: false, draft_year: 1984, jersey_numbers: [12], first_letter_last_name: "S", espn_id: 812 },
+  { name: "Hakeem Olajuwon", position: "C", teams: ["Rockets", "Raptors"], career_ppg: 21.8, career_rpg: 11.1, career_apg: 2.5, career_spg: 1.7, career_bpg: 3.1, championships: 2, all_star_appearances: 12, active: false, draft_year: 1984, jersey_numbers: [34], first_letter_last_name: "O", espn_id: 619 },
+  { name: "Patrick Ewing", position: "C", teams: ["Knicks", "Sonics", "Magic"], career_ppg: 21.0, career_rpg: 9.8, career_apg: 1.9, career_spg: 1.0, career_bpg: 2.4, championships: 0, all_star_appearances: 11, active: false, draft_year: 1985, jersey_numbers: [33, 6], first_letter_last_name: "E", espn_id: 237 },
+  { name: "Charles Barkley", position: "PF", teams: ["76ers", "Suns", "Rockets"], career_ppg: 22.1, career_rpg: 11.7, career_apg: 3.9, career_spg: 1.5, career_bpg: 0.8, championships: 0, all_star_appearances: 11, active: false, draft_year: 1984, jersey_numbers: [34, 4, 32], first_letter_last_name: "B", espn_id: 37 },
+  { name: "Magic Johnson", position: "PG", teams: ["Lakers"], career_ppg: 19.5, career_rpg: 7.2, career_apg: 11.2, career_spg: 1.9, career_bpg: 0.4, championships: 5, all_star_appearances: 12, active: false, draft_year: 1979, jersey_numbers: [32], first_letter_last_name: "J", espn_id: 2334 },
+  { name: "Larry Bird", position: "SF", teams: ["Celtics"], career_ppg: 24.3, career_rpg: 10.0, career_apg: 6.3, career_spg: 1.7, career_bpg: 0.8, championships: 3, all_star_appearances: 12, active: false, draft_year: 1978, jersey_numbers: [33], first_letter_last_name: "B", espn_id: 2335 },
+  { name: "Isiah Thomas", position: "PG", teams: ["Pistons"], career_ppg: 19.2, career_rpg: 3.6, career_apg: 9.3, career_spg: 1.9, career_bpg: 0.3, championships: 2, all_star_appearances: 12, active: false, draft_year: 1981, jersey_numbers: [11], first_letter_last_name: "T", espn_id: 3507 },
+  { name: "David Robinson", position: "C", teams: ["Spurs"], career_ppg: 21.1, career_rpg: 10.6, career_apg: 2.5, career_spg: 1.4, career_bpg: 2.9, championships: 2, all_star_appearances: 10, active: false, draft_year: 1987, jersey_numbers: [50], first_letter_last_name: "R", espn_id: 715 },
+  { name: "Scottie Pippen", position: "SF", teams: ["Bulls", "Rockets", "Trail Blazers"], career_ppg: 16.1, career_rpg: 6.4, career_apg: 5.2, career_spg: 2.0, career_bpg: 0.8, championships: 6, all_star_appearances: 7, active: false, draft_year: 1987, jersey_numbers: [33], first_letter_last_name: "P", espn_id: 663 },
+  { name: "Gary Payton", position: "PG", teams: ["Sonics", "Bucks", "Lakers", "Celtics", "Heat"], career_ppg: 16.3, career_rpg: 3.9, career_apg: 6.7, career_spg: 1.8, career_bpg: 0.2, championships: 1, all_star_appearances: 9, active: false, draft_year: 1990, jersey_numbers: [20], first_letter_last_name: "P", espn_id: 640 },
+  { name: "Reggie Miller", position: "SG", teams: ["Pacers"], career_ppg: 18.2, career_rpg: 3.0, career_apg: 3.0, career_spg: 1.1, career_bpg: 0.2, championships: 0, all_star_appearances: 5, active: false, draft_year: 1987, jersey_numbers: [31], first_letter_last_name: "M", espn_id: 552 },
+  { name: "Dennis Rodman", position: "PF", teams: ["Pistons", "Spurs", "Bulls", "Lakers", "Mavericks"], career_ppg: 7.3, career_rpg: 13.1, career_apg: 1.8, career_spg: 0.7, career_bpg: 0.6, championships: 5, all_star_appearances: 2, active: false, draft_year: 1986, jersey_numbers: [10, 91, 73], first_letter_last_name: "R", espn_id: 726 },
+  { name: "Jason Kidd", position: "PG", teams: ["Mavericks", "Suns", "Nets", "Knicks"], career_ppg: 12.6, career_rpg: 6.3, career_apg: 8.7, career_spg: 1.9, career_bpg: 0.3, championships: 1, all_star_appearances: 10, active: false, draft_year: 1994, jersey_numbers: [5, 2, 32], first_letter_last_name: "K", espn_id: 429 },
+  { name: "Anthony Edwards", position: "SG", teams: ["Timberwolves"], career_ppg: 24.4, career_rpg: 5.5, career_apg: 4.2, career_spg: 1.3, career_bpg: 0.5, championships: 0, all_star_appearances: 3, active: true, draft_year: 2020, jersey_numbers: [5], first_letter_last_name: "E", espn_id: 4594268 },
+  { name: "Ja Morant", position: "PG", teams: ["Grizzlies"], career_ppg: 22.5, career_rpg: 4.5, career_apg: 7.3, career_spg: 0.9, career_bpg: 0.3, championships: 0, all_star_appearances: 2, active: true, draft_year: 2019, jersey_numbers: [12], first_letter_last_name: "M", espn_id: 4279888 },
+  { name: "Bam Adebayo", position: "C", teams: ["Heat"], career_ppg: 16.1, career_rpg: 9.4, career_apg: 3.5, career_spg: 1.0, career_bpg: 0.8, championships: 0, all_star_appearances: 3, active: true, draft_year: 2017, jersey_numbers: [13], first_letter_last_name: "A", espn_id: 4066261 },
+  { name: "Karl-Anthony Towns", position: "C", teams: ["Timberwolves", "Knicks"], career_ppg: 22.9, career_rpg: 10.8, career_apg: 3.4, career_spg: 0.7, career_bpg: 1.2, championships: 0, all_star_appearances: 4, active: true, draft_year: 2015, jersey_numbers: [32], first_letter_last_name: "T", espn_id: 3136195 }
+];
+
+const NFL_PLAYERS = [
+  { name: "Tom Brady", position: "QB", teams: ["Patriots", "Buccaneers"], active: false, draft_year: 2000, career_games: 335, pro_bowls: 15, first_letter_last_name: "B", career_pass_yards: 89214, career_pass_tds: 649, career_ints: 212, super_bowl_wins: 7, espn_id: 2330 },
+  { name: "Patrick Mahomes", position: "QB", teams: ["Chiefs"], active: true, draft_year: 2017, career_games: 110, pro_bowls: 6, first_letter_last_name: "M", career_pass_yards: 32168, career_pass_tds: 238, career_ints: 63, super_bowl_wins: 3, espn_id: 3139477 },
+  { name: "Peyton Manning", position: "QB", teams: ["Colts", "Broncos"], active: false, draft_year: 1998, career_games: 266, pro_bowls: 14, first_letter_last_name: "M", career_pass_yards: 71940, career_pass_tds: 539, career_ints: 251, super_bowl_wins: 2, espn_id: 1428 },
+  { name: "Aaron Rodgers", position: "QB", teams: ["Packers", "Jets"], active: true, draft_year: 2005, career_games: 250, pro_bowls: 10, first_letter_last_name: "R", career_pass_yards: 59055, career_pass_tds: 475, career_ints: 105, super_bowl_wins: 1, espn_id: 8439 },
+  { name: "Drew Brees", position: "QB", teams: ["Chargers", "Saints"], active: false, draft_year: 2001, career_games: 287, pro_bowls: 13, first_letter_last_name: "B", career_pass_yards: 80358, career_pass_tds: 571, career_ints: 243, super_bowl_wins: 1, espn_id: 2580 },
+  { name: "Josh Allen", position: "QB", teams: ["Bills"], active: true, draft_year: 2018, career_games: 105, pro_bowls: 4, first_letter_last_name: "A", career_pass_yards: 27792, career_pass_tds: 195, career_ints: 78, super_bowl_wins: 0, espn_id: 3918298 },
+  { name: "Lamar Jackson", position: "QB", teams: ["Ravens"], active: true, draft_year: 2018, career_games: 94, pro_bowls: 4, first_letter_last_name: "J", career_pass_yards: 18009, career_pass_tds: 128, career_ints: 48, super_bowl_wins: 0, espn_id: 3916387 },
+  { name: "Joe Burrow", position: "QB", teams: ["Bengals"], active: true, draft_year: 2020, career_games: 63, pro_bowls: 2, first_letter_last_name: "B", career_pass_yards: 16756, career_pass_tds: 114, career_ints: 41, super_bowl_wins: 0, espn_id: 3915511 },
+  { name: "Russell Wilson", position: "QB", teams: ["Seahawks", "Broncos", "Steelers"], active: true, draft_year: 2012, career_games: 203, pro_bowls: 9, first_letter_last_name: "W", career_pass_yards: 46233, career_pass_tds: 334, career_ints: 106, super_bowl_wins: 1, espn_id: 14881 },
+  { name: "Ben Roethlisberger", position: "QB", teams: ["Steelers"], active: false, draft_year: 2004, career_games: 249, pro_bowls: 6, first_letter_last_name: "R", career_pass_yards: 64088, career_pass_tds: 418, career_ints: 211, super_bowl_wins: 2, espn_id: 5536 },
+  { name: "Eli Manning", position: "QB", teams: ["Giants"], active: false, draft_year: 2004, career_games: 236, pro_bowls: 4, first_letter_last_name: "M", career_pass_yards: 57023, career_pass_tds: 366, career_ints: 244, super_bowl_wins: 2, espn_id: 5526 },
+  { name: "Brett Favre", position: "QB", teams: ["Falcons", "Packers", "Jets", "Vikings"], active: false, draft_year: 1991, career_games: 302, pro_bowls: 11, first_letter_last_name: "F", career_pass_yards: 71838, career_pass_tds: 508, career_ints: 336, super_bowl_wins: 1, espn_id: 112 },
+  { name: "Dan Marino", position: "QB", teams: ["Dolphins"], active: false, draft_year: 1983, career_games: 242, pro_bowls: 9, first_letter_last_name: "M", career_pass_yards: 61361, career_pass_tds: 420, career_ints: 252, super_bowl_wins: 0, espn_id: 1 },
+  { name: "Derrick Henry", position: "RB", teams: ["Titans", "Ravens"], active: true, draft_year: 2016, career_games: 136, pro_bowls: 3, first_letter_last_name: "H", career_rush_yards: 10681, career_rush_tds: 87, career_receptions: 127, espn_id: 3043078 },
+  { name: "Saquon Barkley", position: "RB", teams: ["Giants", "Eagles"], active: true, draft_year: 2018, career_games: 99, pro_bowls: 3, first_letter_last_name: "B", career_rush_yards: 7419, career_rush_tds: 50, career_receptions: 310, espn_id: 3929630 },
+  { name: "Nick Chubb", position: "RB", teams: ["Browns"], active: true, draft_year: 2018, career_games: 82, pro_bowls: 4, first_letter_last_name: "C", career_rush_yards: 6511, career_rush_tds: 48, career_receptions: 147, espn_id: 3128720 },
+  { name: "Christian McCaffrey", position: "RB", teams: ["Panthers", "49ers"], active: true, draft_year: 2017, career_games: 95, pro_bowls: 3, first_letter_last_name: "M", career_rush_yards: 5723, career_rush_tds: 42, career_receptions: 495, espn_id: 3117251 },
+  { name: "Adrian Peterson", position: "RB", teams: ["Vikings", "Saints", "Cardinals", "Washington", "Lions", "Titans", "Seahawks"], active: false, draft_year: 2007, career_games: 186, pro_bowls: 7, first_letter_last_name: "P", career_rush_yards: 14918, career_rush_tds: 120, career_receptions: 305, espn_id: 10452 },
+  { name: "Marshawn Lynch", position: "RB", teams: ["Bills", "Seahawks", "Raiders"], active: false, draft_year: 2007, career_games: 157, pro_bowls: 5, first_letter_last_name: "L", career_rush_yards: 10413, career_rush_tds: 85, career_receptions: 287, espn_id: 10456 },
+  { name: "LeSean McCoy", position: "RB", teams: ["Eagles", "Bills", "Chiefs", "Buccaneers"], active: false, draft_year: 2009, career_games: 183, pro_bowls: 6, first_letter_last_name: "M", career_rush_yards: 11102, career_rush_tds: 73, career_receptions: 556, espn_id: 12514 },
+  { name: "Frank Gore", position: "RB", teams: ["49ers", "Colts", "Dolphins", "Bills", "Jets"], active: false, draft_year: 2005, career_games: 241, pro_bowls: 5, first_letter_last_name: "G", career_rush_yards: 16000, career_rush_tds: 81, career_receptions: 484, espn_id: 8479 },
+  { name: "Ezekiel Elliott", position: "RB", teams: ["Cowboys", "Patriots", "Cowboys"], active: true, draft_year: 2016, career_games: 125, pro_bowls: 3, first_letter_last_name: "E", career_rush_yards: 8261, career_rush_tds: 68, career_receptions: 305, espn_id: 3051392 },
+  { name: "Le'Veon Bell", position: "RB", teams: ["Steelers", "Jets", "Chiefs", "Ravens", "Buccaneers"], active: false, draft_year: 2013, career_games: 101, pro_bowls: 3, first_letter_last_name: "B", career_rush_yards: 6554, career_rush_tds: 39, career_receptions: 400, espn_id: 15825 },
+  { name: "Dalvin Cook", position: "RB", teams: ["Vikings", "Jets", "Ravens", "Cowboys"], active: true, draft_year: 2017, career_games: 94, pro_bowls: 4, first_letter_last_name: "C", career_rush_yards: 6207, career_rush_tds: 47, career_receptions: 295, espn_id: 3116593 },
+  { name: "Todd Gurley", position: "RB", teams: ["Rams", "Falcons"], active: false, draft_year: 2015, career_games: 87, pro_bowls: 3, first_letter_last_name: "G", career_rush_yards: 6082, career_rush_tds: 58, career_receptions: 280, espn_id: 2977644 },
+  { name: "LaDainian Tomlinson", position: "RB", teams: ["Chargers", "Jets"], active: false, draft_year: 2001, career_games: 170, pro_bowls: 5, first_letter_last_name: "T", career_rush_yards: 13684, career_rush_tds: 145, career_receptions: 624, espn_id: 2553 },
+  { name: "Emmitt Smith", position: "RB", teams: ["Cowboys", "Cardinals"], active: false, draft_year: 1990, career_games: 226, pro_bowls: 8, first_letter_last_name: "S", career_rush_yards: 18355, career_rush_tds: 164, career_receptions: 515, espn_id: 72 },
+  { name: "Barry Sanders", position: "RB", teams: ["Lions"], active: false, draft_year: 1989, career_games: 153, pro_bowls: 10, first_letter_last_name: "S", career_rush_yards: 15269, career_rush_tds: 99, career_receptions: 352, espn_id: 6571 },
+  { name: "Walter Payton", position: "RB", teams: ["Bears"], active: false, draft_year: 1975, career_games: 190, pro_bowls: 9, first_letter_last_name: "P", career_rush_yards: 16726, career_rush_tds: 110, career_receptions: 492, espn_id: 2549756 },
+  { name: "Tyreek Hill", position: "WR", teams: ["Chiefs", "Dolphins"], active: true, draft_year: 2016, career_games: 135, pro_bowls: 7, first_letter_last_name: "H", career_rec_yards: 11269, career_receptions: 779, career_rec_tds: 76, espn_id: 3116406 },
+  { name: "Davante Adams", position: "WR", teams: ["Packers", "Raiders", "Jets"], active: true, draft_year: 2014, career_games: 158, pro_bowls: 6, first_letter_last_name: "A", career_rec_yards: 10990, career_receptions: 826, career_rec_tds: 96, espn_id: 16800 },
+  { name: "Stefon Diggs", position: "WR", teams: ["Vikings", "Bills", "Texans"], active: true, draft_year: 2015, career_games: 144, pro_bowls: 4, first_letter_last_name: "D", career_rec_yards: 10110, career_receptions: 730, career_rec_tds: 55, espn_id: 2976212 },
+  { name: "Justin Jefferson", position: "WR", teams: ["Vikings"], active: true, draft_year: 2020, career_games: 78, pro_bowls: 3, first_letter_last_name: "J", career_rec_yards: 6890, career_receptions: 440, career_rec_tds: 33, espn_id: 4262921 },
+  { name: "Ja'Marr Chase", position: "WR", teams: ["Bengals"], active: true, draft_year: 2021, career_games: 62, pro_bowls: 3, first_letter_last_name: "C", career_rec_yards: 5328, career_receptions: 333, career_rec_tds: 43, espn_id: 4362628 },
+  { name: "CeeDee Lamb", position: "WR", teams: ["Cowboys"], active: true, draft_year: 2020, career_games: 77, pro_bowls: 3, first_letter_last_name: "L", career_rec_yards: 5765, career_receptions: 395, career_rec_tds: 32, espn_id: 4241389 },
+  { name: "DeAndre Hopkins", position: "WR", teams: ["Texans", "Cardinals", "Titans"], active: true, draft_year: 2013, career_games: 168, pro_bowls: 5, first_letter_last_name: "H", career_rec_yards: 12351, career_receptions: 879, career_rec_tds: 72, espn_id: 15795 },
+  { name: "Mike Evans", position: "WR", teams: ["Buccaneers"], active: true, draft_year: 2014, career_games: 163, pro_bowls: 5, first_letter_last_name: "E", career_rec_yards: 12594, career_receptions: 749, career_rec_tds: 95, espn_id: 16737 },
+  { name: "Cooper Kupp", position: "WR", teams: ["Rams"], active: true, draft_year: 2017, career_games: 97, pro_bowls: 3, first_letter_last_name: "K", career_rec_yards: 7036, career_receptions: 545, career_rec_tds: 48, espn_id: 2977187 },
+  { name: "Travis Kelce", position: "TE", teams: ["Chiefs"], active: true, draft_year: 2013, career_games: 179, pro_bowls: 10, first_letter_last_name: "K", career_rec_yards: 12445, career_receptions: 935, career_rec_tds: 74, espn_id: 15847 },
+  { name: "George Kittle", position: "TE", teams: ["49ers"], active: true, draft_year: 2017, career_games: 104, pro_bowls: 4, first_letter_last_name: "K", career_rec_yards: 5748, career_receptions: 416, career_rec_tds: 32, espn_id: 3040151 },
+  { name: "Mark Andrews", position: "TE", teams: ["Ravens"], active: true, draft_year: 2018, career_games: 91, pro_bowls: 3, first_letter_last_name: "A", career_rec_yards: 4012, career_receptions: 299, career_rec_tds: 34, espn_id: 3116365 },
+  { name: "Rob Gronkowski", position: "TE", teams: ["Patriots", "Buccaneers"], active: false, draft_year: 2010, career_games: 143, pro_bowls: 5, first_letter_last_name: "G", career_rec_yards: 9286, career_receptions: 621, career_rec_tds: 92, espn_id: 13229 },
+  { name: "Tony Gonzalez", position: "TE", teams: ["Chiefs", "Falcons"], active: false, draft_year: 1997, career_games: 270, pro_bowls: 14, first_letter_last_name: "G", career_rec_yards: 15127, career_receptions: 1325, career_rec_tds: 111, espn_id: 1231 },
+  { name: "Antonio Brown", position: "WR", teams: ["Steelers", "Raiders", "Patriots", "Buccaneers"], active: false, draft_year: 2010, career_games: 146, pro_bowls: 7, first_letter_last_name: "B", career_rec_yards: 12291, career_receptions: 928, career_rec_tds: 83, espn_id: 13934 },
+  { name: "Julio Jones", position: "WR", teams: ["Falcons", "Titans"], active: false, draft_year: 2011, career_games: 171, pro_bowls: 7, first_letter_last_name: "J", career_rec_yards: 13330, career_receptions: 879, career_rec_tds: 61, espn_id: 13982 },
+  { name: "Odell Beckham Jr", position: "WR", teams: ["Giants", "Browns", "Rams", "Ravens", "Dolphins"], active: true, draft_year: 2014, career_games: 118, pro_bowls: 3, first_letter_last_name: "B", career_rec_yards: 7367, career_receptions: 531, career_rec_tds: 56, espn_id: 16733 },
+  { name: "Larry Fitzgerald", position: "WR", teams: ["Cardinals"], active: false, draft_year: 2004, career_games: 263, pro_bowls: 11, first_letter_last_name: "F", career_rec_yards: 17492, career_receptions: 1432, career_rec_tds: 121, espn_id: 5528 },
+  { name: "Calvin Johnson", position: "WR", teams: ["Lions"], active: false, draft_year: 2007, career_games: 135, pro_bowls: 6, first_letter_last_name: "J", career_rec_yards: 11619, career_receptions: 731, career_rec_tds: 83, espn_id: 10447 },
+  { name: "Randy Moss", position: "WR", teams: ["Vikings", "Raiders", "Patriots", "Titans", "49ers"], active: false, draft_year: 1998, career_games: 218, pro_bowls: 6, first_letter_last_name: "M", career_rec_yards: 15292, career_receptions: 982, career_rec_tds: 156, espn_id: 1433 },
+  { name: "Jerry Rice", position: "WR", teams: ["49ers", "Raiders", "Seahawks"], active: false, draft_year: 1985, career_games: 303, pro_bowls: 13, first_letter_last_name: "R", career_rec_yards: 22895, career_receptions: 1549, career_rec_tds: 197, espn_id: 12 },
+  { name: "Terrell Owens", position: "WR", teams: ["49ers", "Eagles", "Cowboys", "Bills", "Bengals"], active: false, draft_year: 1996, career_games: 219, pro_bowls: 6, first_letter_last_name: "O", career_rec_yards: 15934, career_receptions: 1078, career_rec_tds: 153, espn_id: 1056 },
+  { name: "Shannon Sharpe", position: "TE", teams: ["Broncos", "Ravens"], active: false, draft_year: 1990, career_games: 203, pro_bowls: 8, first_letter_last_name: "S", career_rec_yards: 10060, career_receptions: 815, career_rec_tds: 62, espn_id: 91 },
+  { name: "Jason Witten", position: "TE", teams: ["Cowboys", "Raiders"], active: false, draft_year: 2003, career_games: 271, pro_bowls: 11, first_letter_last_name: "W", career_rec_yards: 13046, career_receptions: 1228, career_rec_tds: 74, espn_id: 4527 }
+];
+
+
+/* ===========================================================
+   HEADSHOT HELPER — ESPN CDN with fallback
+   =========================================================== */
+
+function getHeadshotUrl(playerData) {
+  if (!playerData || !playerData.espn_id) return null;
+  const league = GameState.sport === 'nba' ? 'nba' : 'nfl';
+  return `https://a.espncdn.com/combiner/i?img=/i/headshots/${league}/players/full/${playerData.espn_id}.png&w=96&h=70`;
+}
+
+function getInitials(name) {
+  if (!name) return '?';
+  const parts = name.split(' ');
+  return (parts[0][0] + (parts[parts.length - 1][0] || '')).toUpperCase();
+}
+
+function createHeadshotImg(playerData, size) {
+  const url = getHeadshotUrl(playerData);
+  const initials = getInitials(playerData ? playerData.name : null);
+  const sz = size || 44;
+  if (url) {
+    return `<img src="${url}" width="${sz}" height="${sz}" style="width:${sz}px;height:${sz}px" onerror="this.outerHTML='<div class=\\'avatar-fallback\\' style=\\'width:${sz}px;height:${sz}px\\'>${initials}</div>'" alt="">`;
+  }
+  return `<div class="avatar-fallback" style="width:${sz}px;height:${sz}px">${initials}</div>`;
+}
+
+
+/* ===========================================================
+   GAME STATE
+   =========================================================== */
+
+const GameState = {
+  apiKey: '',
+  sport: '',
+  player1Name: '',
+  player2Name: '',
+  currentPlayer: 1,
+  currentSlotIndex: 0,
+  clues: [],
+  attempts: 0,
+  maxAttempts: 3,
+  player1Picks: [],
+  player2Picks: [],
+  player1Scores: [],
+  player2Scores: []
+};
+
+/* ===========================================================
+   SCREEN MANAGEMENT
+   =========================================================== */
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+/* ===========================================================
+   SETUP SCREEN LOGIC
+   =========================================================== */
+
+function selectSport(sport) {
+  GameState.sport = sport;
+  document.querySelectorAll('.sport-btn').forEach(b => {
+    b.classList.remove('selected', 'nfl');
+    if (b.dataset.sport === sport) {
+      b.classList.add('selected');
+      if (sport === 'nfl') b.classList.add('nfl');
+    }
+  });
+  updateAccentColors(sport);
+  checkStartReady();
+}
+
+function updateAccentColors(sport) {
+  const root = document.documentElement;
+  if (sport === 'nfl') {
+    root.style.setProperty('--accent', 'var(--nfl-primary)');
+    root.style.setProperty('--accent-bg', 'var(--nfl-secondary)');
+    root.style.setProperty('--accent-gradient', 'var(--nfl-gradient)');
+    root.style.setProperty('--accent-dark', 'var(--nfl-dark)');
+  } else {
+    root.style.setProperty('--accent', 'var(--nba-primary)');
+    root.style.setProperty('--accent-bg', 'var(--nba-secondary)');
+    root.style.setProperty('--accent-gradient', 'var(--nba-gradient)');
+    root.style.setProperty('--accent-dark', 'var(--nba-dark)');
+  }
+}
+
+function checkStartReady() {
+  const key = document.getElementById('api-key-input').value.trim();
+  const p1 = document.getElementById('p1-name-input').value.trim();
+  const p2 = document.getElementById('p2-name-input').value.trim();
+  document.getElementById('start-btn').disabled = !(key && p1 && p2 && GameState.sport);
+}
+
+document.getElementById('api-key-input').addEventListener('input', checkStartReady);
+document.getElementById('p1-name-input').addEventListener('input', checkStartReady);
+document.getElementById('p2-name-input').addEventListener('input', checkStartReady);
+
+/* ===========================================================
+   API CALL — GENERATE CLUES
+   =========================================================== */
+
+const FLAVOR_TEXTS = [
+  "Scouting the league...",
+  "Reviewing film...",
+  "Building the draft board...",
+  "Checking the stat sheets...",
+  "Analyzing matchups...",
+  "Consulting the front office...",
+  "Crunching the numbers..."
+];
+
+let flavorInterval = null;
+
+function startFlavorRotation() {
+  let idx = 0;
+  const el = document.getElementById('loader-text');
+  el.textContent = FLAVOR_TEXTS[0];
+  flavorInterval = setInterval(() => {
+    idx = (idx + 1) % FLAVOR_TEXTS.length;
+    el.style.opacity = 0;
+    setTimeout(() => { el.textContent = FLAVOR_TEXTS[idx]; el.style.opacity = 1; }, 300);
+  }, 2000);
+}
+
+function stopFlavorRotation() { if (flavorInterval) clearInterval(flavorInterval); }
+
+async function startGame() {
+  GameState.apiKey = document.getElementById('api-key-input').value.trim();
+  GameState.player1Name = document.getElementById('p1-name-input').value.trim();
+  GameState.player2Name = document.getElementById('p2-name-input').value.trim();
+  GameState.currentPlayer = 1;
+  GameState.currentSlotIndex = 0;
+  GameState.player1Picks = [];
+  GameState.player2Picks = [];
+  GameState.player1Scores = [];
+  GameState.player2Scores = [];
+
+  // loader updated — no sport-specific icons needed
+  
+
+  showScreen('loading-screen');
+  document.getElementById('loader-error').style.display = 'none';
+  document.getElementById('retry-btn').style.display = 'none';
+  startFlavorRotation();
+
+  await generateClues();
+}
+
+async function retryGenerate() {
+  document.getElementById('loader-error').style.display = 'none';
+  document.getElementById('retry-btn').style.display = 'none';
+  startFlavorRotation();
+  await generateClues();
+}
+
+async function generateClues() {
+  const dataset = GameState.sport === 'nba' ? NBA_PLAYERS : NFL_PLAYERS;
+  const slots = GameState.sport === 'nba'
+    ? ['PG', 'SG', 'SF', 'PF', 'C']
+    : ['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'FLEX'];
+  const numClues = slots.length;
+
+  const systemPrompt = `You are a sports trivia question generator for a fantasy draft game. You will receive a dataset of players and must generate clues.
+
+RULES:
+1. Return ONLY a valid JSON array. No markdown, no explanation, no backticks.
+2. Generate exactly ${numClues} clue objects (one per roster slot).
+3. Each clue must have 2–3 constraints that intersect interestingly. Mix constraint types: team history, statistical thresholds, draft era, name patterns, championships/awards, active/retired status.
+4. Each clue MUST have between 2 and 6 valid answers from the provided dataset. Before including a clue, verify the count of matching players. If fewer than 2 or more than 6 match, revise the clue.
+5. For NBA: each clue's valid answers must all play the position for that slot.
+6. For NFL: QB clue must have QB answers. RB1 and RB2 clues must have RB answers. WR1 and WR2 must have WR or TE answers. FLEX clue can have RB, WR, or TE answers.
+7. Make clues interesting and varied — not trivially easy, not impossibly obscure.
+8. Write clue_text in natural language, like a fun sports broadcast puzzle (e.g. "Name a shooting guard who won at least 2 rings, played in the Western Conference, and whose last name starts before M in the alphabet").
+
+JSON format per clue:
+{ "slot": "${slots[0]}", "position": "${slots[0]}", "clue_text": "...", "valid_answers": ["Player Name 1", "Player Name 2"] }
+
+For NFL FLEX slot, set position to "FLEX".`;
+
+  const userMessage = `Here is the player dataset for ${GameState.sport.toUpperCase()}:\n\n${JSON.stringify(dataset, null, 1)}\n\nRoster slots needed: ${slots.join(', ')}\n\nGenerate ${numClues} clues following the rules above. Return ONLY the JSON array.`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': GameState.apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 2000,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userMessage }]
+      })
+    });
+
+    if (!resp.ok) {
+      const status = resp.status;
+      if (status === 401) throw new Error('Invalid API key. Please check your key and try again.');
+      if (status === 429) throw new Error('Rate limit reached. Please wait a moment and try again.');
+      throw new Error(`API request failed (status ${status}). Please try again.`);
+    }
+
+    const data = await resp.json();
+    let text = data.content[0].text;
+
+    text = text.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+
+    let clues;
+    try {
+      clues = JSON.parse(text);
+    } catch {
+      throw new Error("Couldn't parse the generated questions. Please try again.");
+    }
+
+    if (!Array.isArray(clues) || clues.length < 1) {
+      throw new Error("Couldn't generate enough questions. Please try again.");
+    }
+
+    GameState.clues = clues;
+    stopFlavorRotation();
+    beginDraft();
+
+  } catch (err) {
+    stopFlavorRotation();
+    const errorEl = document.getElementById('loader-error');
+    if (err.name === 'TypeError' && err.message.includes('fetch')) {
+      errorEl.textContent = "Couldn't reach the server — check your connection and try again.";
+    } else {
+      errorEl.textContent = err.message;
+    }
+    errorEl.style.display = 'block';
+    document.getElementById('retry-btn').style.display = 'inline-flex';
+  }
+}
+
+
+/* ===========================================================
+   DRAFT SCREEN LOGIC
+   =========================================================== */
+
+function beginDraft() {
+  GameState.currentSlotIndex = 0;
+  GameState.attempts = 0;
+  showScreen('draft-screen');
+  renderDraftSlot();
+}
+
+function renderDraftSlot() {
+  const clue = GameState.clues[GameState.currentSlotIndex];
+  if (!clue) return;
+  const totalSlots = GameState.clues.length;
+  const playerName = GameState.currentPlayer === 1 ? GameState.player1Name : GameState.player2Name;
+  document.getElementById('draft-player-name').textContent = `${playerName}'s Draft`;
+  document.getElementById('draft-slot-info').textContent = `Slot ${GameState.currentSlotIndex + 1} of ${totalSlots}`;
+  document.getElementById('progress-fill').style.width = `${((GameState.currentSlotIndex) / totalSlots) * 100}%`;
+  document.getElementById('clue-slot-badge').textContent = clue.slot;
+  document.getElementById('clue-text').textContent = clue.clue_text;
+  document.getElementById('answer-input').value = '';
+  document.getElementById('answer-feedback').className = 'answer-feedback';
+  document.getElementById('answer-feedback').textContent = '';
+  document.getElementById('correct-reveal').style.display = 'none';
+  document.getElementById('correct-reveal').innerHTML = '';
+  document.getElementById('attempts-left').textContent = `Attempts remaining: ${GameState.maxAttempts - GameState.attempts}`;
+  document.getElementById('answer-input').focus();
+}
+
+document.getElementById('answer-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') submitAnswer();
+});
+
+function normalize(str) {
+  return str.toLowerCase().trim().replace(/[.\-']/g, '');
+}
+
+function submitAnswer() {
+  const input = document.getElementById('answer-input').value.trim();
+  if (!input) return;
+
+  const clue = GameState.clues[GameState.currentSlotIndex];
+  const dataset = GameState.sport === 'nba' ? NBA_PLAYERS : NFL_PLAYERS;
+  const feedback = document.getElementById('answer-feedback');
+  const inputEl = document.getElementById('answer-input');
+
+  const normInput = normalize(input);
+
+  const anyDatasetMatch = dataset.find(p => normalize(p.name) === normInput || normalize(p.name.split(' ').pop()) === normInput);
+
+  let matched = null;
+  for (const ans of clue.valid_answers) {
+    const normAns = normalize(ans);
+    const lastName = normalize(ans.split(' ').pop());
+    if (normInput === normAns || normInput === lastName) {
+      if (normInput === lastName) {
+        const lastNameMatches = clue.valid_answers.filter(a => normalize(a.split(' ').pop()) === normInput);
+        if (lastNameMatches.length === 1) { matched = ans; break; }
+      } else {
+        matched = ans;
+        break;
+      }
+    }
+  }
+
+  if (matched) {
+    const playerData = dataset.find(p => normalize(p.name) === normalize(matched));
+    const picks = GameState.currentPlayer === 1 ? GameState.player1Picks : GameState.player2Picks;
+    picks.push({ slot: clue.slot, playerName: matched, playerData: playerData });
+
+    feedback.className = 'answer-feedback success';
+    feedback.textContent = '';
+
+    // Show player reveal with headshot
+    const revealEl = document.getElementById('correct-reveal');
+    revealEl.style.display = 'block';
+    revealEl.innerHTML = `<div class="correct-player-reveal">
+      ${createHeadshotImg(playerData, 52)}
+      <div class="correct-player-info">✓ ${matched} — great pick!</div>
+    </div>`;
+
+    inputEl.classList.add('green-flash');
+    document.getElementById('clue-card').classList.add('green-flash');
+    setTimeout(() => {
+      inputEl.classList.remove('green-flash');
+      document.getElementById('clue-card').classList.remove('green-flash');
+    }, 600);
+
+    document.getElementById('submit-answer-btn').disabled = true;
+    setTimeout(() => {
+      document.getElementById('submit-answer-btn').disabled = false;
+      advanceSlot();
+    }, 1400);
+  } else {
+    GameState.attempts++;
+    inputEl.classList.add('shake');
+    setTimeout(() => inputEl.classList.remove('shake'), 400);
+
+    if (GameState.attempts >= GameState.maxAttempts) {
+      const picks = GameState.currentPlayer === 1 ? GameState.player1Picks : GameState.player2Picks;
+      picks.push({ slot: clue.slot, playerName: null, playerData: null });
+      feedback.className = 'answer-feedback error';
+      feedback.textContent = `Out of attempts! Moving on...`;
+      document.getElementById('submit-answer-btn').disabled = true;
+      setTimeout(() => {
+        document.getElementById('submit-answer-btn').disabled = false;
+        advanceSlot();
+      }, 1500);
+    } else {
+      if (!anyDatasetMatch) {
+        feedback.className = 'answer-feedback error';
+        feedback.textContent = "I don't recognize that player — check the spelling.";
+      } else {
+        feedback.className = 'answer-feedback error';
+        feedback.textContent = "That player doesn't match the clue — try again!";
+      }
+      document.getElementById('attempts-left').textContent = `Attempts remaining: ${GameState.maxAttempts - GameState.attempts}`;
+    }
+  }
+}
+
+function advanceSlot() {
+  GameState.currentSlotIndex++;
+  GameState.attempts = 0;
+
+  if (GameState.currentSlotIndex >= GameState.clues.length) {
+    showRosterSummary();
+  } else {
+    renderDraftSlot();
+  }
+}
+
+
+/* ===========================================================
+   ROSTER SUMMARY — with headshots
+   =========================================================== */
+
+function showRosterSummary() {
+  const picks = GameState.currentPlayer === 1 ? GameState.player1Picks : GameState.player2Picks;
+  const name = GameState.currentPlayer === 1 ? GameState.player1Name : GameState.player2Name;
+  document.getElementById('roster-title').textContent = `${name}'s Roster`;
+
+  const list = document.getElementById('roster-list');
+  list.innerHTML = '';
+  picks.forEach(p => {
+    const li = document.createElement('li');
+    li.className = 'roster-item';
+    if (p.playerName && p.playerData) {
+      li.innerHTML = `${createHeadshotImg(p.playerData, 44)}
+        <span class="slot-label">${p.slot}</span>
+        <span class="player-name">${p.playerName}</span>`;
+    } else {
+      li.innerHTML = `<div class="avatar-fallback" style="width:44px;height:44px;opacity:0.3">?</div>
+        <span class="slot-label">${p.slot}</span>
+        <span class="no-pick">No Pick</span>`;
+    }
+    list.appendChild(li);
+  });
+
+  showScreen('roster-screen');
+}
+
+function lockIn() {
+  if (GameState.currentPlayer === 1) {
+    document.getElementById('handoff-text').textContent = `Hand the device to ${GameState.player2Name}`;
+    showScreen('handoff-screen');
+  } else {
+    calculateAllScores();
+    startReveal();
+  }
+}
+
+function startPlayer2Turn() {
+  GameState.currentPlayer = 2;
+  GameState.currentSlotIndex = 0;
+  GameState.attempts = 0;
+  showScreen('draft-screen');
+  renderDraftSlot();
+}
+
+
+/* ===========================================================
+   FANTASY SCORING
+   =========================================================== */
+
+function calcNBAScore(p) {
+  if (!p) return 0;
+  return Math.round((p.career_ppg * 1.0 + p.career_rpg * 1.2 + p.career_apg * 1.5 + p.career_spg * 3.0 + p.career_bpg * 3.0) * 82);
+}
+
+function calcNFLScore(p) {
+  if (!p) return 0;
+  const g = p.career_games || 1;
+  if (p.position === 'QB') {
+    const ypg = (p.career_pass_yards || 0) / g;
+    const tdpg = (p.career_pass_tds || 0) / g;
+    const intpg = (p.career_ints || 0) / g;
+    return Math.round((ypg / 25 + tdpg * 4 - intpg * 2) * 17);
+  }
+  if (p.position === 'RB') {
+    const rypg = (p.career_rush_yards || 0) / g;
+    const rtdpg = (p.career_rush_tds || 0) / g;
+    const recpg = (p.career_receptions || 0) / g;
+    return Math.round((rypg / 10 + rtdpg * 6 + recpg * 0.5) * 17);
+  }
+  const recypg = (p.career_rec_yards || 0) / g;
+  const rectdpg = (p.career_rec_tds || 0) / g;
+  const recpg = (p.career_receptions || 0) / g;
+  return Math.round((recypg / 10 + rectdpg * 6 + recpg * 0.5) * 17);
+}
+
+function calcScore(playerData) {
+  if (!playerData) return 0;
+  return GameState.sport === 'nba' ? calcNBAScore(playerData) : calcNFLScore(playerData);
+}
+
+function calculateAllScores() {
+  GameState.player1Scores = GameState.player1Picks.map(p => calcScore(p.playerData));
+  GameState.player2Scores = GameState.player2Picks.map(p => calcScore(p.playerData));
+}
+
+
+/* ===========================================================
+   THE REVEAL — with headshots
+   =========================================================== */
+
+function startReveal() {
+  showScreen('reveal-screen');
+  document.getElementById('reveal-p1-name').textContent = GameState.player1Name;
+  document.getElementById('reveal-p2-name').textContent = GameState.player2Name;
+
+  const grid = document.getElementById('reveal-grid');
+  grid.innerHTML = '';
+
+  const numSlots = GameState.clues.length;
+  for (let i = 0; i < numSlots; i++) {
+    const row = document.createElement('div');
+    row.className = 'reveal-row';
+    row.id = `reveal-row-${i}`;
+    row.innerHTML = `
+      <div class="reveal-cell" id="cell-p1-${i}">
+        <div id="img-p1-${i}"></div>
+        <div class="pick-info">
+          <div class="pick-name" id="name-p1-${i}">—</div>
+          <div class="pick-score" id="score-p1-${i}"></div>
+        </div>
+      </div>
+      <div class="reveal-slot-label">${GameState.clues[i].slot}</div>
+      <div class="reveal-cell cell-right" id="cell-p2-${i}">
+        <div id="img-p2-${i}"></div>
+        <div class="pick-info">
+          <div class="pick-name" id="name-p2-${i}">—</div>
+          <div class="pick-score" id="score-p2-${i}"></div>
+        </div>
+      </div>`;
+    grid.appendChild(row);
+  }
+
+  document.getElementById('reveal-totals').classList.remove('visible');
+  document.getElementById('total-p1-score').textContent = '0';
+  document.getElementById('total-p2-score').textContent = '0';
+  document.getElementById('total-p1').classList.remove('winner-total');
+  document.getElementById('total-p2').classList.remove('winner-total');
+  document.getElementById('winner-banner').classList.remove('visible');
+  document.getElementById('play-again-area').classList.remove('visible');
+  document.getElementById('confetti-container').innerHTML = '';
+
+  animateReveal(0);
+}
+
+function animateReveal(slotIdx) {
+  const numSlots = GameState.clues.length;
+  if (slotIdx >= numSlots) {
+    setTimeout(showTotals, 1000);
+    return;
+  }
+
+  const row = document.getElementById(`reveal-row-${slotIdx}`);
+  row.classList.add('visible', 'active-row');
+
+  const p1Pick = GameState.player1Picks[slotIdx];
+  const p2Pick = GameState.player2Picks[slotIdx];
+  const s1 = GameState.player1Scores[slotIdx];
+  const s2 = GameState.player2Scores[slotIdx];
+
+  setTimeout(() => {
+    const cellP1 = document.getElementById(`cell-p1-${slotIdx}`);
+    cellP1.classList.add('show-left');
+    document.getElementById(`name-p1-${slotIdx}`).textContent = p1Pick.playerName || 'No Pick';
+    document.getElementById(`img-p1-${slotIdx}`).innerHTML = p1Pick.playerData ? createHeadshotImg(p1Pick.playerData, 44) : '<div class="avatar-fallback" style="width:44px;height:44px;opacity:0.3">?</div>';
+    if (!p1Pick.playerName) cellP1.classList.add('no-pick-cell');
+  }, 200);
+
+  setTimeout(() => {
+    const cellP2 = document.getElementById(`cell-p2-${slotIdx}`);
+    cellP2.classList.add('show-right');
+    document.getElementById(`name-p2-${slotIdx}`).textContent = p2Pick.playerName || 'No Pick';
+    document.getElementById(`img-p2-${slotIdx}`).innerHTML = p2Pick.playerData ? createHeadshotImg(p2Pick.playerData, 44) : '<div class="avatar-fallback" style="width:44px;height:44px;opacity:0.3">?</div>';
+    if (!p2Pick.playerName) cellP2.classList.add('no-pick-cell');
+  }, 600);
+
+  setTimeout(() => {
+    animateCounter(`score-p1-${slotIdx}`, 0, s1, 600);
+    animateCounter(`score-p2-${slotIdx}`, 0, s2, 600);
+  }, 1100);
+
+  setTimeout(() => {
+    const cellP1 = document.getElementById(`cell-p1-${slotIdx}`);
+    const cellP2 = document.getElementById(`cell-p2-${slotIdx}`);
+    if (s1 > s2) { cellP1.classList.add('winner'); cellP2.classList.add('loser'); }
+    else if (s2 > s1) { cellP2.classList.add('winner'); cellP1.classList.add('loser'); }
+    row.classList.remove('active-row');
+  }, 1800);
+
+  setTimeout(() => animateReveal(slotIdx + 1), 2200);
+}
+
+function animateCounter(elementId, from, to, duration) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  const startTime = performance.now();
+  function update(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    el.textContent = Math.round(from + (to - from) * eased);
+    if (progress < 1) requestAnimationFrame(update);
+  }
+  requestAnimationFrame(update);
+}
+
+function showTotals() {
+  const t1 = GameState.player1Scores.reduce((a, b) => a + b, 0);
+  const t2 = GameState.player2Scores.reduce((a, b) => a + b, 0);
+
+  document.getElementById('reveal-totals').classList.add('visible');
+  animateCounter('total-p1-score', 0, t1, 1200);
+  animateCounter('total-p2-score', 0, t2, 1200);
+
+  setTimeout(() => {
+    if (t1 > t2) document.getElementById('total-p1').classList.add('winner-total');
+    else if (t2 > t1) document.getElementById('total-p2').classList.add('winner-total');
+
+    const banner = document.getElementById('winner-banner');
+    const nameEl = document.getElementById('winner-name-text');
+    const labelEl = document.getElementById('winner-label-text');
+
+    if (t1 === t2) {
+      nameEl.textContent = "It's a Tie!";
+      labelEl.textContent = `${t1} — ${t2}`;
+    } else {
+      const winner = t1 > t2 ? GameState.player1Name : GameState.player2Name;
+      nameEl.textContent = `${winner} Wins!`;
+      labelEl.textContent = `${Math.max(t1, t2)} — ${Math.min(t1, t2)}`;
+      launchConfetti();
+    }
+    banner.classList.add('visible');
+    document.getElementById('play-again-area').classList.add('visible');
+  }, 1500);
+}
+
+
+/* ===========================================================
+   CONFETTI
+   =========================================================== */
+
+function launchConfetti() {
+  const container = document.getElementById('confetti-container');
+  const colors = ['#60a5fa', '#3b82f6', '#34d399', '#f87171', '#93c5fd', '#a855f7', '#ffffff'];
+  for (let i = 0; i < 80; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.left = Math.random() * 100 + '%';
+    piece.style.width = (6 + Math.random() * 8) + 'px';
+    piece.style.height = (6 + Math.random() * 8) + 'px';
+    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.animationDuration = (2 + Math.random() * 3) + 's';
+    piece.style.animationDelay = (Math.random() * 1.5) + 's';
+    piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    container.appendChild(piece);
+  }
+  setTimeout(() => { container.innerHTML = ''; }, 6000);
+}
+
+
+/* ===========================================================
+   PLAY AGAIN
+   =========================================================== */
+
+function playAgain() {
+  GameState.clues = [];
+  GameState.player1Picks = [];
+  GameState.player2Picks = [];
+  GameState.player1Scores = [];
+  GameState.player2Scores = [];
+  GameState.currentPlayer = 1;
+  GameState.currentSlotIndex = 0;
+  GameState.attempts = 0;
+  GameState.sport = '';
+  document.querySelectorAll('.sport-btn').forEach(b => b.classList.remove('selected', 'nfl'));
+  document.getElementById('api-key-input').value = GameState.apiKey;
+  checkStartReady();
+  showScreen('setup-screen');
+}
+</script>
+</body>
+</html>

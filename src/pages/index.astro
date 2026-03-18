@@ -331,24 +331,28 @@ const photos = [
             </div>
           </a>
 
-          <div
-            class="relative overflow-hidden rounded-[2rem] min-h-[200px] border border-white/8 bg-[linear-gradient(135deg,_rgba(24,24,27,1),_rgba(13,13,14,1))] p-7 animate-on-scroll"
+          <a
+            href="/fantasy-draft.html"
+            class="group relative overflow-hidden rounded-[2rem] min-h-[200px] border border-white/8 bg-[radial-gradient(circle_at_bottom_left,_rgba(251,146,60,0.14),_transparent_28%),linear-gradient(135deg,_rgba(24,24,27,1),_rgba(13,13,14,1))] p-7 animate-on-scroll hover:border-orange-400/20 transition-all duration-300"
             style="transition-delay: 0.18s"
           >
             <div class="absolute inset-0 opacity-[0.05]" style="background-image: linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px); background-size: 30px 30px;"></div>
-            <div class="absolute bottom-0 right-0 h-32 w-32 rounded-full bg-emerald-400/10 blur-3xl"></div>
+            <div class="absolute bottom-0 right-0 h-32 w-32 rounded-full bg-orange-400/10 blur-3xl group-hover:bg-orange-400/20 transition-all duration-500"></div>
+            <div class="absolute top-0 left-0 h-24 w-24 rounded-full bg-blue-500/10 blur-3xl"></div>
             <div class="relative z-10 flex h-full flex-col justify-between">
-              <span class="inline-flex w-fit items-center gap-1.5 rounded-full border border-white/12 bg-white/5 px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-white/40">
-                In progress
+              <span class="inline-flex w-fit items-center gap-1.5 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-emerald-300">
+                <span class="h-1.5 w-1.5 rounded-full bg-emerald-300 animate-pulse"></span>
+                Live
               </span>
               <div>
-                <p class="text-[10px] uppercase tracking-[0.28em] text-white/35 mb-3">Next up</p>
-                <h3 class="text-3xl font-heading font-bold italic text-white mb-3">More soon</h3>
-                <p class="text-sm text-white/60 leading-relaxed">Will update soon!</p>
+                <p class="text-[10px] uppercase tracking-[0.28em] text-white/35 mb-3">Two-player trivia game</p>
+                <h3 class="text-3xl font-heading font-bold italic text-white mb-3 group-hover:text-amber-200 transition-colors">Fantasy Draft</h3>
+                <p class="text-sm text-white/60 leading-relaxed">Answer sports clues, build a roster, and see who wins the fantasy matchup.</p>
               </div>
             </div>
+          </a>
           </div>
-        </div>
+        </a>
       </div>
     </div>
   </section>
